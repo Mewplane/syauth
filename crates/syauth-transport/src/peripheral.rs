@@ -336,6 +336,17 @@ pub struct PersistentPeripheral {
 }
 
 impl PersistentPeripheral {
+    /// Open the available BlueZ default adapter, including renumbered controllers.
+    pub async fn new_default() -> Result<(Arc<Self>, mpsc::Receiver<([u8; PAIR_PUBKEY_LEN], [u8; PAIR_PUBKEY_LEN])>), PeripheralError> {
+        let session = bluer::Session::new().await.map_err(|err| PeripheralError::Backend {
+            reason: format!("default adapter session: {err}"),
+        })?;
+        let adapter = session.default_adapter().await.map_err(|err| PeripheralError::Backend {
+            reason: format!("default adapter selection: {err}"),
+        })?;
+        Self::new(adapter.name()).await
+    }
+
     /// Construct a `PersistentPeripheral` bound to `adapter_id`.
     ///
     /// Opens the BlueZ adapter, powers it on, and registers an empty
@@ -1247,5 +1258,14 @@ mod tests {
             PeripheralError::PeerAlreadyAdded { peer_id } => assert_eq!(peer_id, "a"),
             other => panic!("expected PeerAlreadyAdded, got {other:?}"),
         }
+    }
+
+    #[tokio::test]
+    #[ignore = "requires live BlueZ; temporarily registers a GATT application"]
+    async fn persistent_peripheral_opens_default_bluez_adapter() {
+        let session = bluer::Session::new().await.expect("system bus");
+        let expected = session.default_adapter().await.expect("available adapter");
+        let (peripheral, _events) = PersistentPeripheral::new_default().await.expect("open default adapter");
+        assert_eq!(peripheral.adapter.name(), expected.name());
     }
 }

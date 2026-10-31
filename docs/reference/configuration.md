@@ -2,6 +2,12 @@
 
 This page describes the active daemon and PAM configuration. It does not replace the design specification or change the service's authentication policy.
 
+The presence daemon selects BlueZ's available default Bluetooth adapter at
+startup. It does not assume the controller is named `hci0`; reinitialized
+controllers can appear as `hci1` or later. After controller removal, restarting
+the daemon selects the currently available adapter. An RPC status of `up` alone
+does not establish that the desktop is advertising or the phone is subscribed.
+
 ## Files and ownership
 
 | Path | Owner / use |
