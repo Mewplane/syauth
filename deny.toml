@@ -39,6 +39,7 @@ ignore = [
     { id = "RUSTSEC-2026-0370", reason = "zvariant is required by secret-service 5; zbus 6 migration is unreleased" },
     { id = "RUSTSEC-2026-0371", reason = "zbus_names is required by secret-service 5; zbus 6 migration is unreleased" },
     { id = "RUSTSEC-2026-0372", reason = "zvariant_derive is required by secret-service 5; zbus 6 migration is unreleased" },
+    { id = "RUSTSEC-2026-0374", reason = "Build-only Askama configuration parser, still required by current UniFFI; no patched release exists. Track replacement in BUG-20261031-1221." },
 ]
 
 # ---------------------------------------------------------------------------
