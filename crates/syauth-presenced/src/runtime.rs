@@ -15,7 +15,7 @@ use std::{
 };
 
 use syauth_core::{Bond, BondStatus, BondStore, bond_key_from_pubkeys, peer_id_from_pubkey};
-use syauth_transport::{BOND_KEY_BYTES, DEFAULT_ADAPTER_NAME, FakePeripheral, Peripheral, PersistentPeripheral};
+use syauth_transport::{BOND_KEY_BYTES, FakePeripheral, Peripheral, PersistentPeripheral};
 use tokio::{
     signal::unix::{SignalKind, signal},
     sync::mpsc,
@@ -329,7 +329,7 @@ async fn maybe_spawn_orchestrator(
     // spin up on the next reload.
     type PairEventRx = tokio::sync::mpsc::Receiver<([u8; 32], [u8; 32])>;
     let (peripheral, pair_events): (Arc<dyn Peripheral + Send + Sync>, Option<PairEventRx>) = match config.peripheral_mode {
-        PeripheralMode::Real => match PersistentPeripheral::new(DEFAULT_ADAPTER_NAME).await {
+        PeripheralMode::Real => match PersistentPeripheral::new_default().await {
             Ok((p, rx)) => (p, Some(rx)),
             Err(err) => {
                 warn_no_orchestrator(&format!("BlueZ adapter open failed: {err}"));

@@ -13,7 +13,7 @@
 # or via `make rpm` (which gates on `which mock`).
 
 %global package_version 0.1.0
-%global rpm_release 4
+%global rpm_release 5
 %global debug_package %{nil}
 %global min_fedora 39
 
@@ -163,6 +163,9 @@ fi
 %{_mandir}/man8/syauth.8.gz
 
 %changelog
+* Sat Oct 31 2026 syauth contributors <maintainers@example.invalid> - 0.1.0-5
+- Select the available BlueZ default adapter when starting the presence daemon.
+
 * Tue Oct 20 2026 syauth contributors <maintainers@example.invalid> - 0.1.0-4
 - Publish native Linux packages, a signed Android APK, and release checksums.
 - Add package-manager installation and published documentation.
