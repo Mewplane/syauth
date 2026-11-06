@@ -69,3 +69,19 @@ Include the CLI and APK versions, distribution, BlueZ version, phone model and A
 The [repository Bluetooth guide](https://github.com/dmytrogajewski/syauth/blob/master/docs/bluetooth.md) includes the emulator harness and its qualifications. Arch Linux KDE users can also consult the optional [package update checker](https://github.com/dmytrogajewski/syauth/blob/master/docs/arch-update-check.md).
 
 <!-- Structure: Diátaxis troubleshooting how-to; original prose for syauth. -->
+
+## Controller reset leaves authentication unavailable
+
+Check `syauth status --json` and the service journal. `daemon.state: up` means
+that RPC works. `daemon.transport_ready: true` means the last transport check
+found a powered controller and an active advertisement. Neither confirms that
+the phone is nearby.
+
+The daemon checks transport every two seconds. Controller removal, missing
+advertising, and advertisement update failures cause a failure exit. The managed
+service retries every two seconds, rebuilding GATT and advertising on the
+available default controller. Existing bonds stay on disk. An absent controller
+does not exhaust the service restart limit.
+
+An unanswered phone approval does not trigger transport recovery. Bring the phone
+back and retry authentication. Each successful request still needs phone approval.

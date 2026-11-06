@@ -63,6 +63,10 @@ struct FakeStatusDaemon {
 
 impl FakeStatusDaemon {
     fn new(socket: PathBuf, peers: Vec<PeerStatus>, started_at: SystemTime) -> Self {
+        Self::with_transport_health(socket, peers, started_at, true)
+    }
+
+    fn with_transport_health(socket: PathBuf, peers: Vec<PeerStatus>, started_at: SystemTime, ready: bool) -> Self {
         let listener = UnixListener::bind(&socket).expect("bind fake daemon listener");
         listener.set_nonblocking(false).expect("blocking listener");
         let (tx, _rx) = mpsc::channel::<()>();
@@ -71,7 +75,11 @@ impl FakeStatusDaemon {
                 let _ = stream.set_read_timeout(Some(Duration::from_secs(2)));
                 let _ = stream.set_write_timeout(Some(Duration::from_secs(2)));
                 if let Ok(Request::Status) = read_frame_blocking::<_, Request>(&mut stream) {
-                    let resp = Response::Status { peers, started_at };
+                    let resp = Response::Status {
+                        peers,
+                        started_at,
+                        transport_ready: Some(ready),
+                    };
                     let _ = write_frame_blocking(&mut stream, &resp);
                 }
                 let mut buf = [0u8; 1];
@@ -187,4 +195,21 @@ fn json_mode_emits_typed_object() {
     let daemon = obj.get("daemon").and_then(|v| v.as_object()).expect("daemon object");
     let state = daemon.get("state").and_then(|v| v.as_str()).expect("state token");
     assert!(matches!(state, "up" | "down"), "unexpected state token {state}");
+}
+
+#[test]
+fn json_reports_transport_failure_independently_of_daemon_liveness() {
+    let td = TempDir::new().expect("tempdir");
+    let socket = td.path().join("auth.sock");
+    let _daemon = FakeStatusDaemon::with_transport_health(socket.clone(), vec![peer_row("phone")], SystemTime::now(), false);
+    let out = syauth()
+        .args(["status", "--json", "--socket"])
+        .arg(&socket)
+        .args(["--adapter", "absent-adapter", "--bond-dir"])
+        .arg(td.path())
+        .assert()
+        .success();
+    let value: serde_json::Value = serde_json::from_slice(&out.get_output().stdout).expect("JSON");
+    assert_eq!(value["daemon"]["state"], "up");
+    assert_eq!(value["daemon"]["transport_ready"], false);
 }

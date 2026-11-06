@@ -373,7 +373,12 @@ async fn dispatch(
                 Some(o) => o.peers_snapshot().await,
                 None => Vec::new(),
             };
-            Response::Status { peers, started_at }
+            let transport_ready = Some(orchestrator.is_some_and(|o| o.transport_ready()));
+            Response::Status {
+                peers,
+                started_at,
+                transport_ready,
+            }
         }
     }
 }

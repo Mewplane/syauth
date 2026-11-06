@@ -37,6 +37,27 @@ const REFUSAL_BUDGET: Duration = Duration::from_secs(5);
 const POLL_INTERVAL: Duration = Duration::from_millis(25);
 
 #[test]
+fn unavailable_bluez_exits_for_supervised_recovery() {
+    let env = TestEnv::new();
+    let mut child = Command::new(daemon_bin_path())
+        .args(["--peripheral", "real", "--pidfile"])
+        .arg(env.pidfile_path())
+        .arg("--bonds-file")
+        .arg(&env.bonds_file)
+        .env("DBUS_SYSTEM_BUS_ADDRESS", "unix:path=/nonexistent/syauth-test-bus")
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .expect("spawn");
+    let result = wait_for_exit(&mut child, SHUTDOWN_BUDGET);
+    if result.is_err() {
+        child.kill().expect("kill failed daemon");
+        child.wait().expect("reap");
+    }
+    assert!(!result.expect("transport failure must exit for restart").success());
+}
+
+#[test]
 fn starts_and_terminates_cleanly() {
     let env = TestEnv::new();
     let mut child = env.spawn_daemon();

@@ -286,3 +286,64 @@ impl Visit for MessageVisitor {
         }
     }
 }
+
+#[tokio::test]
+async fn transport_is_not_ready_before_advertising() {
+    let orchestrator = Orchestrator::new(FakePeripheral::new(), fixture_bond(), BOND_KEY, tokio::time::Instant::now());
+    assert!(!orchestrator.transport_ready());
+}
+
+#[tokio::test]
+async fn advertising_makes_transport_ready_without_a_phone() {
+    let orchestrator = Arc::new(Orchestrator::new(
+        FakePeripheral::new(),
+        fixture_bond(),
+        BOND_KEY,
+        tokio::time::Instant::now(),
+    ));
+    let (tx, rx) = oneshot::channel();
+    let handle = tokio::spawn(orchestrator.clone().run(rx));
+    tokio::task::yield_now().await;
+    let ready = orchestrator.transport_ready();
+    tx.send(()).expect("shutdown");
+    handle.await.expect("join");
+    assert!(ready);
+}
+
+#[tokio::test(start_paused = true)]
+async fn failed_advertisement_clears_readiness() {
+    let fake = FakePeripheral::new();
+    let start = tokio::time::Instant::now() + Duration::from_secs(SECONDS_PER_MINUTE);
+    let orchestrator = Arc::new(Orchestrator::new(fake.clone(), fixture_bond(), BOND_KEY, start));
+    let (tx, rx) = oneshot::channel();
+    let handle = tokio::spawn(orchestrator.clone().run(rx));
+    tokio::task::yield_now().await;
+    assert!(orchestrator.transport_ready());
+    fake.set_transport_failed(true);
+    tokio::time::advance(Duration::from_secs(SECONDS_PER_MINUTE)).await;
+    tokio::task::yield_now().await;
+    let ready = orchestrator.transport_ready();
+    tx.send(()).expect("shutdown");
+    handle.await.expect("join");
+    assert!(!ready);
+}
+
+#[tokio::test]
+async fn controller_loss_is_detected_before_next_rotation() {
+    let fake = FakePeripheral::new();
+    let orchestrator = Arc::new(Orchestrator::new(
+        fake.clone(),
+        fixture_bond(),
+        BOND_KEY,
+        tokio::time::Instant::now() + Duration::from_secs(SECONDS_PER_MINUTE),
+    ));
+    let (tx, rx) = oneshot::channel();
+    let handle = tokio::spawn(orchestrator.clone().run(rx));
+    tokio::task::yield_now().await;
+    fake.set_transport_failed(true);
+    let result = orchestrator.check_transport().await;
+    tx.send(()).expect("shutdown");
+    handle.await.expect("join");
+    assert!(result.is_err());
+    assert!(!orchestrator.transport_ready());
+}
