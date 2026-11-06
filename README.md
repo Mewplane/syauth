@@ -8,6 +8,8 @@ Approve Linux authentication on your Android phone with a fresh strong biometric
 
 ## Install
 
+For Nix or NixOS, use the [Nix setup below](#nix-and-nixos).
+
 On a supported Linux desktop:
 
 ```sh
@@ -29,6 +31,21 @@ Release downloads include DEB, RPM, Arch Linux packages, and manual Linux archiv
 
 Use Debian 12+, Ubuntu 24.04+, a current Fedora/openSUSE/Arch installation, or a compatible derivative, with glibc 2.36+, PAM, systemd user services, BlueZ, and a BLE adapter capable of advertising. The phone needs Android 13+ with a supported Ed25519 Keystore implementation and an enrolled strong biometric. The APK can install on older Android versions, but that does not establish signing-key support.
 
+### Nix and NixOS
+
+The flake supports `x86_64-linux` and `aarch64-linux`. With Nix and flakes enabled, install into your user profile without cloning the repository:
+
+```sh
+nix profile install github:dmytrogajewski/syauth
+syauth --version
+```
+
+This installs the CLI, `syauth-presenced` daemon, and PAM module; storage, service activation, and PAM still need configuration. See [profile installation and setup](docs/how-to/install.md#install-with-nix) for details and update/removal commands.
+
+For NixOS, add `github:dmytrogajewski/syauth` as a flake input and import `syauth.nixosModules.default`. Enable `services.syauth`, set `desktopUser` to your existing desktop account, and select the PAM services through `pam.services` (empty by default). The module manages the package, private bond-store directory, and daemon in that account's systemd user session. Run pairing as that account, without `sudo`.
+
+Follow the [installation guide](docs/how-to/install.md#configure-nixos) for the complete flake configuration and activation commands. The [NixOS module reference](docs/reference/nix-modules.md) documents all options and PAM policy.
+
 ## Use
 
 1. Install the desktop package and signed Android companion.
@@ -48,11 +65,14 @@ Being nearby prepares the connection; each authentication still needs explicit a
 
 - [First unlock tutorial](https://dmytrogajewski.github.io/syauth/tutorials/first-unlock/)
 - [Install](https://dmytrogajewski.github.io/syauth/how-to/install/), [pair and revoke](https://dmytrogajewski.github.io/syauth/how-to/pair-and-revoke/), [troubleshoot](https://dmytrogajewski.github.io/syauth/how-to/troubleshoot/)
+- [Nix and NixOS setup](docs/how-to/install.md#install-with-nix), [NixOS module options](docs/reference/nix-modules.md)
 - [CLI](https://dmytrogajewski.github.io/syauth/reference/cli/), [configuration](https://dmytrogajewski.github.io/syauth/reference/configuration/), [protocol](https://dmytrogajewski.github.io/syauth/reference/protocol/)
 - [Illustrated mechanics](https://dmytrogajewski.github.io/syauth/explanation/mechanics/) with animated pairing, discovery, and unlock
 - [Release builds and signing](https://dmytrogajewski.github.io/syauth/contributing/releases/)
 
 ## Development and contributing
+
+For a pinned Rust development environment, run `nix develop .`. Entering the shell also installs the repository's pre-commit hooks. Build from a checkout with `nix build .` and try the CLI with `nix run . -- --version`. Run `nix flake check .` to build the package and check the generated NixOS configuration; see [building with Nix](docs/how-to/install.md#with-nix) for details.
 
 The Rust workspace is under `crates/`; the Android app is under `syauth-android/`. Build from source with a toolchain compatible with the committed `Cargo.lock` and development packages for D-Bus, PAM, and Bluetooth:
 

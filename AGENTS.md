@@ -410,6 +410,13 @@ make install           # Install to ~/.cargo/bin
 make docker-build      # Build Docker image
 make docker-test       # Build and run tests in container
 
+# Nix
+nix develop .          # Enter the pinned Rust development environment
+nix build .            # Build the package and run workspace tests
+nix flake check .      # Check the package and generated NixOS configuration
+nix develop . --command make lint
+nix develop . --command make test
+
 # Benchmarks
 make bench             # Run benchmarks
 ```

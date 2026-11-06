@@ -2,6 +2,8 @@
 
 This guide sets up the desktop daemon and Android companion, then explains how to enable one PAM service. It targets a single desktop account using the default `/var/lib/syauth` store.
 
+Choose a desktop installation method: [release package](#install-a-release-package), [Nix profile](#install-with-nix), [NixOS module](#configure-nixos), or [source build](#build-the-desktop-from-source). Then install the Android companion and pair your phone. The NixOS module manages storage, the user service, and selected PAM rules; other installation methods need those setup steps separately.
+
 ## Prerequisites
 
 Use Linux with glibc 2.36+, PAM, systemd user services, BlueZ, and a BLE adapter capable of advertising. Release packages target Debian 12+, Ubuntu 24.04+, and current Fedora, openSUSE, and Arch systems. Both x86_64 and ARM64 artifacts are available; the tested distribution/CPU matrix is listed in [release development](../contributing/releases.md#artifact-contract).
@@ -53,7 +55,99 @@ For ARM64, use the DEB ending in `_arm64.deb`, or the RPM/Arch filename with `aa
 
 Packages install `/usr/bin/syauth`, `/usr/libexec/syauth-presenced`, the distribution's `pam_syauth.so`, and `/usr/lib/systemd/user/syauth-presenced.service`. Continue with storage preparation below.
 
+## Install with Nix
+
+On x86-64 or ARM64 Linux with flakes enabled:
+
+```sh
+nix profile install github:dmytrogajewski/syauth
+syauth --version
+```
+
+Includes the CLI, daemon, and PAM module. On NixOS, use the
+[module below](#configure-nixos). Otherwise, follow [storage and service setup](#prepare-storage-and-the-user-service),
+using the profile's `syauth-presenced` as `--from` and
+`lib/security/pam_syauth.so` as the PAM module path.
+
+Update or remove using the entry name from `nix profile list`:
+
+```sh
+nix profile list
+nix profile upgrade syauth
+nix profile remove syauth
+```
+
+Remove its PAM rules and disable the user service before uninstalling.
+
+## Configure NixOS
+
+Add the input and module to your NixOS `flake.nix`:
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    syauth = {
+      url = "github:dmytrogajewski/syauth";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+
+  outputs = { nixpkgs, syauth, ... }: {
+    nixosConfigurations.my-host = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        ./configuration.nix
+        syauth.nixosModules.default
+        {
+          hardware.bluetooth.enable = true;
+          services.syauth = {
+            enable = true;
+            desktopUser = "alice";
+            pam.services = [ "sudo" ];
+            pam.moduleArgs = [ "socket=/run/user/1000/syauth/auth.sock" ];
+          };
+        }
+      ];
+    };
+  };
+}
+```
+
+Adjust `my-host`, `system`, and `alice` for your host. The account must
+exist in `users.users`; use its UID (`id -u alice`) in the socket path.
+
+PAM services: `sudo` (also `sudo-i` for [sudo-rs](https://github.com/trifectatechfoundation/sudo-rs)), `kde` (Plasma lock screen),
+`plasmalogin` (Plasma Login Manager). See [module options](../reference/nix-modules.md)
+for defaults and PAM policy. The daemon requires an active user session.
+
 ## Build the desktop from source
+
+### With Nix
+
+From a checkout, enter the development shell:
+
+```sh
+nix develop .
+make build
+make test
+make lint
+```
+
+The shell provides pinned Rust and pre-commit hooks;
+[nix-direnv](https://github.com/nix-community/nix-direnv) users can run
+`direnv allow` for automatic loading. The flake declares the nix-community
+Cachix cache.
+
+For the Nix package and module checks:
+
+```sh
+nix build .
+nix run . -- --version
+nix flake check .
+```
+
+### With Cargo
 
 Source builds additionally require a Rust toolchain compatible with `Cargo.lock`, a C toolchain, `pkg-config`, and development packages for D-Bus, PAM, and Bluetooth (`libdbus-1-dev`, `libpam0g-dev`, and `libbluetooth-dev` on Debian).
 
