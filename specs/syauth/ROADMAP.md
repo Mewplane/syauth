@@ -1020,6 +1020,42 @@ The method is a hidden API since API 1 and remains hidden in API 34. `Reflection
 
 ---
 
+## Step S-022: Nix flake
+
+Build and run syauth with Nix on x86-64 and ARM64 Linux. The default
+development shell supplies the pinned Rust toolchain.
+
+- [x] Expose the package, CLI app, development shell and checks for both systems.
+- [x] Run the Rust workspace suite in the package build.
+- [x] Document [Nix installation](../../docs/how-to/install.md#install-with-nix)
+  and [build commands](../../docs/how-to/install.md#with-nix).
+
+[Journey S-022](../journeys/JOURNEY-S-022-nix-flake-linux.md) ·
+[Flake](../../flake.nix) · [Package](../../nix/package.nix)
+
+## Step S-023: NixOS module
+
+Configure one desktop account through `nixosModules.default`. The module
+sets up the CLI, private store, systemd user unit, and selected PAM rules.
+
+- [x] The generated user unit is restricted to the selected account, which also
+  owns the store.
+- [x] PAM is opt-in by service. The rule supports a control override and
+  socket arguments, including services that use a substack.
+- [x] The flake has one NixOS evaluation check covering the generated
+  configuration.
+- [x] The [installation guide](../../docs/how-to/install.md#configure-nixos)
+  includes the flake input, module import, and settings.
+
+[Journey S-023](../journeys/JOURNEY-S-023-nix-modules.md) ·
+[Module](../../nix/modules/nixos.nix) · [Check](../../nix/check.nix) ·
+[Socket regression](../bugs/BUG-20261108-nix-pam-socket.md) ·
+[Installed-PAM VM](../../nix/tests/installation.nix)
+
+Verified by flake checks on x86-64 and by evaluation on ARM64. The module
+check covers the generated sudo-rs and Plasma PAM rules, and the rendered
+systemd unit uses the configured account's `ConditionUser`.
+
 ## Dependency graph
 
 ```
