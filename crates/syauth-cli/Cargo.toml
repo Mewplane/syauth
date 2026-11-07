@@ -74,7 +74,7 @@ serde_json = "1"
 # wire shape the PAM module uses to probe the daemon's auth.sock.
 # `syauth-presenced` already lives in the workspace; this dependency is
 # library-only (no binary linkage).
-syauth-presenced = { version = "0.1", path = "../syauth-presenced" }
+syauth-presenced = { version = "0.2", path = "../syauth-presenced" }
 # S-016 doctor: `geteuid()` for the `/run/user/<uid>` fallback when
 # `XDG_RUNTIME_DIR` is unset. `nix` already lives in `Cargo.lock`
 # via `syauth-presenced`, so no new transitive surface.

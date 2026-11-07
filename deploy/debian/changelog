@@ -1,3 +1,10 @@
+syauth (0.2.0-1) unstable; urgency=medium
+
+  * Recover Bluetooth transport after controller loss.
+  * Report controller and advertising health independently of phone presence.
+
+ -- syauth contributors <maintainers@example.invalid>  Sat, 07 Nov 2026 00:00:00 +0000
+
 syauth (0.1.0-1) unstable; urgency=medium
 
   * Initial release (Closes: #1).

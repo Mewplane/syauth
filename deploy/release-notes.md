@@ -1,3 +1,20 @@
+# syauth 0.2.0
+
+This release restores phone discovery after Bluetooth controller resets and
+reports transport health separately from daemon liveness.
+
+- Automatically rebuild GATT and rotating advertising after controller loss,
+  including controllers renamed from hci0 to hci1. Keep the existing pairing.
+- Retry while the controller is unavailable without exhausting the service
+  restart limit. Bluetooth setup failures request recovery instead of leaving
+  a socket-only daemon.
+- Add `daemon.transport_ready` to `syauth status --json`. Phone absence and an
+  unanswered approval do not indicate a failed local Bluetooth transport.
+- Include patched ctutils and Tokio dependencies.
+
+The companion panel update is in https://github.com/dmytrogajewski/sy/pull/9.
+Each authentication still requires explicit phone approval and a strong biometric.
+
 Approve Linux authentication on Android with a fresh strong biometric.
 
 - Native desktop DEB, RPM, and Arch packages and Linux archives for x86_64 and ARM64.

@@ -4,16 +4,16 @@ The [release workflow](https://github.com/dmytrogajewski/syauth/actions/workflow
 
 ## Artifact contract
 
-For version `0.1.0`, [GitHub Releases](https://github.com/dmytrogajewski/syauth/releases/tag/v0.1.0) contains:
+For version `0.2.0`, [GitHub Releases](https://github.com/dmytrogajewski/syauth/releases/tag/v0.2.0) contains:
 
 | Artifact | Consumer |
 | --- | --- |
-| `syauth_0.1.0_amd64.deb`, `syauth_0.1.0_arm64.deb` | Debian / Ubuntu and compatible derivatives |
-| `syauth-0.1.0-4.x86_64.rpm`, `syauth-0.1.0-4.aarch64.rpm` | Fedora / openSUSE and compatible RPM systems |
-| `syauth-0.1.0-1-x86_64.pkg.tar.zst`, `syauth-0.1.0-1-aarch64.pkg.tar.zst` | Arch package-manager installations; ARM64 requires an appropriate Arch Linux ARM system |
-| `syauth-0.1.0-linux-{x86_64,aarch64}.tar.gz` | Manual installation / inspection |
-| `syauth-0.1.0-android.apk` | Android companion, signed with the persistent release key |
-| `syauth-0.1.0-source.tar.gz` | Tagged project sources |
+| `syauth_0.2.0_amd64.deb`, `syauth_0.2.0_arm64.deb` | Debian / Ubuntu and compatible derivatives |
+| `syauth-0.2.0-4.x86_64.rpm`, `syauth-0.2.0-4.aarch64.rpm` | Fedora / openSUSE and compatible RPM systems |
+| `syauth-0.2.0-1-x86_64.pkg.tar.zst`, `syauth-0.2.0-1-aarch64.pkg.tar.zst` | Arch package-manager installations; ARM64 requires an appropriate Arch Linux ARM system |
+| `syauth-0.2.0-linux-{x86_64,aarch64}.tar.gz` | Manual installation / inspection |
+| `syauth-0.2.0-android.apk` | Android companion, signed with the persistent release key |
+| `syauth-0.2.0-source.tar.gz` | Tagged project sources |
 | `install.sh` | Version-selecting, checksum-verifying shell installer |
 | `android-signing-certificate.pem`, `android-signing-certificate.txt` | Public signing identity and APK verification output |
 | `release.json`, `SHA256SUMS` | Source revision, file sizes, SHA-256 digests |
@@ -26,9 +26,9 @@ Build the three desktop outputs and package them on the target CPU:
 
 ```sh
 cargo build --locked --release -p syauth-cli -p syauth-pam -p syauth-presenced
-scripts/build-linux-packages.sh --version 0.1.0 --arch x86_64 \
+scripts/build-linux-packages.sh --version 0.2.0 --arch x86_64 \
   --binaries target/release --output target/release-artifacts
-scripts/test-package-install.sh target/release-artifacts 0.1.0 x86_64 debian
+scripts/test-package-install.sh target/release-artifacts 0.2.0 x86_64 debian
 ```
 
 Use `--arch aarch64` for ARM64 binaries. The packager downloads checksum-pinned nFPM 2.47.0; it does not install build tools globally. Building on a newer distribution can raise the required glibc version, so use the workflow's Debian 12 build environment for published artifacts.
@@ -41,7 +41,7 @@ The workflow installs JDK 21, Android platform 34, Build Tools 34.0.0, NDK 28.0.
 
 ```sh
 NDK_HOME="$ANDROID_HOME/ndk/28.0.13004108" scripts/build_aar.sh
-VERSION=0.1.0 scripts/build-release-apk.sh
+VERSION=0.2.0 scripts/build-release-apk.sh
 ```
 
 The signing script requires `SYAUTH_RELEASE_KEYSTORE` and `SYAUTH_RELEASE_KEYSTORE_PASSWORD`; the key alias defaults to `syauth`. Keep private material outside the checkout. The protected GitHub environment `release` stores `SYAUTH_RELEASE_KEYSTORE_BASE64` and `SYAUTH_RELEASE_KEYSTORE_PASSWORD`. Its key persists across releases; replacing it prevents ordinary Android updates from trusting the old installation.

@@ -72,13 +72,13 @@ nix = { version = "0.29", features = ["fs", "signal", "user", "socket"] }
 libc = "0.2"
 # S-004: the orchestrator reads `Bond` metadata for the rotation
 # audit line and reuses `bond_key_from_pubkeys` / `BondStore` shapes.
-syauth-core = { version = "0.1", path = "../syauth-core" }
+syauth-core = { version = "0.2", path = "../syauth-core" }
 # S-004: the `Peripheral` trait + `session_uuid_for` derivation +
 # `BOND_KEY_BYTES` width all live in the transport crate. The
 # `test-fake` feature ships the radio-free `FakePeripheral` test
 # double for the rotation integration test; it is a default feature
 # of `syauth-transport` so no explicit `features` list is required.
-syauth-transport = { version = "0.1", path = "../syauth-transport" }
+syauth-transport = { version = "0.2", path = "../syauth-transport" }
 # S-004: 128-bit UUID type for the rotation audit short-hex render.
 uuid = { version = "1" }
 # S-005: belt-and-suspenders inotify watcher on `bonds.toml`. The
