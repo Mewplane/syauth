@@ -34,7 +34,7 @@ The long-running daemon keeps radio state outside the synchronous PAM call. PAM 
 
 The private signing key remains behind its Android Keystore alias. The public-key derivation in step 4 does not create a secret unknown to anyone who knows those public keys. The application confirmation is useful for checking the exchanged identities, but is not a substitute for a confidential key exchange. See [the security boundaries](security.md#implementation-and-design).
 
-Implementation anchors: [bond derivation](https://github.com/dmytrogajewski/syauth/blob/648375e/crates/syauth-core/src/bond.rs), [phone exchange wiring](https://github.com/dmytrogajewski/syauth/blob/648375e/syauth-android/app/src/main/kotlin/com/sy/syauth/android/pair/impl/RealPairBackendWiring.kt), [Keystore key generation](https://github.com/dmytrogajewski/syauth/blob/648375e/syauth-android/app/src/main/kotlin/com/sy/syauth/android/pair/impl/KeystoreKeyGenerator.kt).
+Implementation anchors: [bond derivation](https://github.com/Mewplane/syauth/blob/648375e/crates/syauth-core/src/bond.rs), [phone exchange wiring](https://github.com/Mewplane/syauth/blob/648375e/syauth-android/app/src/main/kotlin/com/sy/syauth/android/pair/impl/RealPairBackendWiring.kt), [Keystore key generation](https://github.com/Mewplane/syauth/blob/648375e/syauth-android/app/src/main/kotlin/com/sy/syauth/android/pair/impl/KeystoreKeyGenerator.kt).
 
 ## Discovery: prepare the channel
 
@@ -52,7 +52,7 @@ The UUID is a matching mechanism, not proof of distance or authorization. Someon
 
 When the radio disconnects, Android retries setup through service discovery and subscription. The desktop discards a closed notifier while keeping its GATT application registered for re-subscription. OS scheduling, Doze, adapter behavior, and manufacturer restrictions affect recovery; a successful radio toggle is not evidence for all range-loss cases.
 
-Implementation anchors: [session UUID derivation](https://github.com/dmytrogajewski/syauth/blob/648375e/crates/syauth-transport/src/bluez.rs), [phone scan slots](https://github.com/dmytrogajewski/syauth/blob/648375e/syauth-android/app/src/main/kotlin/com/sy/syauth/android/bg/BleScanController.kt), [persistent phone connection](https://github.com/dmytrogajewski/syauth/blob/648375e/syauth-android/app/src/main/kotlin/com/sy/syauth/android/bg/PersistentGattClient.kt), [notification lifecycle](https://github.com/dmytrogajewski/syauth/blob/648375e/crates/syauth-transport/src/peripheral/notification.rs).
+Implementation anchors: [session UUID derivation](https://github.com/Mewplane/syauth/blob/648375e/crates/syauth-transport/src/bluez.rs), [phone scan slots](https://github.com/Mewplane/syauth/blob/648375e/syauth-android/app/src/main/kotlin/com/sy/syauth/android/bg/BleScanController.kt), [persistent phone connection](https://github.com/Mewplane/syauth/blob/648375e/syauth-android/app/src/main/kotlin/com/sy/syauth/android/bg/PersistentGattClient.kt), [notification lifecycle](https://github.com/Mewplane/syauth/blob/648375e/crates/syauth-transport/src/peripheral/notification.rs).
 
 ## Unlock: a fresh signature for each request
 
@@ -69,7 +69,7 @@ A captured signature covers one particular challenge body. Changing its nonce ch
 
 The active phone callbacks do not call the core MAC verifier before showing the prompt. The active PAM handler trusts the daemon's reason rather than verifying the response itself. These boundaries are material to the [security model](security.md), even though the common happy-path animation ends with verification success.
 
-Implementation anchors: [PAM authentication](https://github.com/dmytrogajewski/syauth/blob/648375e/crates/syauth-pam/src/auth.rs), [daemon state machine](https://github.com/dmytrogajewski/syauth/blob/648375e/crates/syauth-presenced/src/orchestrator.rs), [phone callback](https://github.com/dmytrogajewski/syauth/blob/648375e/syauth-android/app/src/main/kotlin/com/sy/syauth/android/bg/SyauthCompanionService.kt), [approval and signing](https://github.com/dmytrogajewski/syauth/blob/648375e/syauth-android/app/src/main/kotlin/com/sy/syauth/android/bg/ChallengeApprovalActivity.kt).
+Implementation anchors: [PAM authentication](https://github.com/Mewplane/syauth/blob/648375e/crates/syauth-pam/src/auth.rs), [daemon state machine](https://github.com/Mewplane/syauth/blob/648375e/crates/syauth-presenced/src/orchestrator.rs), [phone callback](https://github.com/Mewplane/syauth/blob/648375e/syauth-android/app/src/main/kotlin/com/sy/syauth/android/bg/SyauthCompanionService.kt), [approval and signing](https://github.com/Mewplane/syauth/blob/648375e/syauth-android/app/src/main/kotlin/com/sy/syauth/android/bg/ChallengeApprovalActivity.kt).
 
 ## When the happy path stops
 

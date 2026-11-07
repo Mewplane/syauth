@@ -14,14 +14,14 @@ Approve Linux authentication on your Android phone. syauth carries a fresh chall
 
 [Set up syauth](how-to/install.md){ .md-button .md-button--primary }
 [See the mechanics](explanation/mechanics.md){ .md-button }
-[Download a release](https://github.com/dmytrogajewski/syauth/releases/latest){ .md-button }
+[Download a release](https://github.com/Mewplane/syauth/releases/latest){ .md-button }
 
 </div>
 </div>
 
 ## Install the release
 
-Install the desktop with `curl -fsSL https://dmytrogajewski.github.io/syauth/install.sh | sh`, then follow [installation and setup](how-to/install.md). The [published v0.2.0 assets](https://github.com/dmytrogajewski/syauth/releases/tag/v0.2.0) include DEB/RPM/Arch packages for both CPU architectures, the [signed Android companion](https://github.com/dmytrogajewski/syauth/releases/download/v0.2.0/syauth-0.2.0-android.apk), and [checksums](https://github.com/dmytrogajewski/syauth/releases/download/v0.2.0/SHA256SUMS).
+Install the desktop with `curl -fsSL https://mewplane.github.io/syauth/install.sh | sh`, then follow [installation and setup](how-to/install.md). The [published v0.2.0 assets](https://github.com/Mewplane/syauth/releases/tag/v0.2.0) include DEB/RPM/Arch packages for both CPU architectures, the [signed Android companion](https://github.com/Mewplane/syauth/releases/download/v0.2.0/syauth-0.2.0-android.apk), and [checksums](https://github.com/Mewplane/syauth/releases/download/v0.2.0/SHA256SUMS).
 
 ## Follow one unlock
 
@@ -65,4 +65,4 @@ Use Android 13 or later with a supported Ed25519 Android Keystore implementation
 
 These pages describe the implementation, including its limitations. In particular, the current bond derivation is not the hybrid key exchange described in the design specification, and the desktop stores application bond material in files. Read [the implementation boundaries](explanation/security.md#implementation-and-design) before enabling PAM.
 
-[Source code](https://github.com/dmytrogajewski/syauth) · [Report a problem](https://github.com/dmytrogajewski/syauth/issues) · [Build these docs](contributing/documentation.md)
+[Source code](https://github.com/Mewplane/syauth) · [Report a problem](https://github.com/Mewplane/syauth/issues) · [Build these docs](contributing/documentation.md)

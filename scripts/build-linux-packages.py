@@ -48,7 +48,7 @@ def package_config(version, arch, kind, binaries):
         "release": "4" if kind == "rpm" else "1", "section": "admin", "priority": "optional",
         "maintainer": "syauth contributors <noreply@github.com>",
         "description": "Phone-as-key PAM authenticator with a per-user presence daemon.",
-        "homepage": "https://github.com/dmytrogajewski/syauth", "license": "MIT",
+        "homepage": "https://github.com/Mewplane/syauth", "license": "MIT",
         "depends": dependencies[kind], "contents": contents,
         "scripts": {"postinstall": str(ROOT / "deploy/packages/postinstall.sh")},
     }

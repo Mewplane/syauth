@@ -15,7 +15,7 @@ Before enabling PAM, read [security boundaries](../explanation/security.md). Kee
 Install the latest release with your native package manager:
 
 ```sh
-curl -fsSL https://dmytrogajewski.github.io/syauth/install.sh | sh
+curl -fsSL https://mewplane.github.io/syauth/install.sh | sh
 ```
 
 The POSIX shell installer reads your distribution and architecture, resolves one GitHub release tag, downloads that tag's package and `SHA256SUMS`, checks the exact package digest, then invokes `apt`, `dnf`, `zypper`, or `pacman`. It requests `sudo` when necessary. An unsupported system or checksum mismatch stops installation. It does not change PAM stacks, enable services, or change existing bond ownership.
@@ -23,7 +23,7 @@ The POSIX shell installer reads your distribution and architecture, resolves one
 To inspect the script, select a version, or preview package selection:
 
 ```sh
-curl -fsSLo install-syauth.sh https://dmytrogajewski.github.io/syauth/install.sh
+curl -fsSLo install-syauth.sh https://mewplane.github.io/syauth/install.sh
 less install-syauth.sh
 sh install-syauth.sh --version 0.2.0 --dry-run
 sh install-syauth.sh --version 0.2.0
@@ -31,10 +31,10 @@ sh install-syauth.sh --version 0.2.0
 
 ### Direct downloads
 
-The [v0.2.0 release](https://github.com/dmytrogajewski/syauth/releases/tag/v0.2.0) has the native packages, manual archives, source, signed APK, and checksums. For example, on Debian/Ubuntu x86_64:
+The [v0.2.0 release](https://github.com/Mewplane/syauth/releases/tag/v0.2.0) has the native packages, manual archives, source, signed APK, and checksums. For example, on Debian/Ubuntu x86_64:
 
 ```sh
-release=https://github.com/dmytrogajewski/syauth/releases/download/v0.2.0
+release=https://github.com/Mewplane/syauth/releases/download/v0.2.0
 curl -fSLO "$release/syauth_0.2.0_amd64.deb"
 curl -fSLO "$release/SHA256SUMS"
 sha256sum --check --ignore-missing SHA256SUMS
@@ -112,7 +112,7 @@ The `--dry-run` command **writes the unit file** but skips the binary copy and `
 
 ## Install the Android app
 
-Download the [signed Android APK](https://github.com/dmytrogajewski/syauth/releases/download/v0.2.0/syauth-0.2.0-android.apk) and [SHA256SUMS](https://github.com/dmytrogajewski/syauth/releases/download/v0.2.0/SHA256SUMS). Verify the downloaded file before opening it on your phone, or install it with ADB:
+Download the [signed Android APK](https://github.com/Mewplane/syauth/releases/download/v0.2.0/syauth-0.2.0-android.apk) and [SHA256SUMS](https://github.com/Mewplane/syauth/releases/download/v0.2.0/SHA256SUMS). Verify the downloaded file before opening it on your phone, or install it with ADB:
 
 ```sh
 sha256sum --check --ignore-missing SHA256SUMS

@@ -1,10 +1,10 @@
 # Build and publish a release
 
-The [release workflow](https://github.com/dmytrogajewski/syauth/actions/workflows/release.yml) builds native Linux packages and a signed Android APK from the same source revision. Pushes to `release/**` branches and manual workflow runs validate and upload artifacts without creating a public release. A `vMAJOR.MINOR.PATCH` tag publishes after every build and package-install check passes.
+The [release workflow](https://github.com/Mewplane/syauth/actions/workflows/release.yml) builds native Linux packages and a signed Android APK from the same source revision. Pushes to `release/**` branches and manual workflow runs validate and upload artifacts without creating a public release. A `vMAJOR.MINOR.PATCH` tag publishes after every build and package-install check passes.
 
 ## Artifact contract
 
-For version `0.2.0`, [GitHub Releases](https://github.com/dmytrogajewski/syauth/releases/tag/v0.2.0) contains:
+For version `0.2.0`, [GitHub Releases](https://github.com/Mewplane/syauth/releases/tag/v0.2.0) contains:
 
 | Artifact | Consumer |
 | --- | --- |
@@ -62,4 +62,4 @@ The public release certificate's SHA-256 fingerprint is:
 4. The workflow publishes only after both Linux architectures, signed Android output, and the package-install matrix pass. `release.json` records the source revision. The publishing job verifies all checksums again.
 5. Download the published artifacts, verify `SHA256SUMS` and the APK certificate, and check the live Pages installation guide and installer.
 
-The release workflow has write access only in its publishing job. Documentation checks run on pull requests; the Pages deployment job runs only from `master`, with Pages and OIDC permissions. Its deployment URL is [the documentation site](https://dmytrogajewski.github.io/syauth/), also shown in the repository's website field.
+The release workflow has write access only in its publishing job. Documentation checks run on pull requests; the Pages deployment job runs only from `master`, with Pages and OIDC permissions. Its deployment URL is [the documentation site](https://mewplane.github.io/syauth/), also shown in the repository's website field.

@@ -73,6 +73,6 @@ The syauth module returns success, authentication error, or authentication-infor
 
 The shipped unit restarts on failure and restricts filesystem writes to its configured paths. If you override data paths, review the unit's `ReadWritePaths` too. Its user-session lifetime also matters for authentication before login: a stopped user service cannot answer requests.
 
-Source: [PAM configuration](https://github.com/dmytrogajewski/syauth/blob/648375e/crates/syauth-pam/src/config.rs), [orchestrator limits](https://github.com/dmytrogajewski/syauth/blob/648375e/crates/syauth-presenced/src/orchestrator.rs), [user unit](https://github.com/dmytrogajewski/syauth/blob/648375e/crates/syauth-presenced/dist/syauth-presenced.service).
+Source: [PAM configuration](https://github.com/Mewplane/syauth/blob/648375e/crates/syauth-pam/src/config.rs), [orchestrator limits](https://github.com/Mewplane/syauth/blob/648375e/crates/syauth-presenced/src/orchestrator.rs), [user unit](https://github.com/Mewplane/syauth/blob/648375e/crates/syauth-presenced/dist/syauth-presenced.service).
 
 <!-- Structure: Diátaxis reference; original prose for syauth. -->

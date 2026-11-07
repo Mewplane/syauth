@@ -65,6 +65,15 @@ cp "$source" "$out"
         return subprocess.run(["sh", str(REPO / "scripts/install.sh"), *args],
                               env=self.env, text=True, capture_output=True)
 
+    def test_downloads_and_guidance_use_the_current_repository_owner(self):
+        result = self.run_installer("--dry-run")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        urls = self.requests.read_text().splitlines()
+        self.assertEqual(urls[0], "https://api.github.com/repos/Mewplane/syauth/releases/latest")
+        self.assertTrue(all(url.startswith("https://github.com/Mewplane/syauth/") for url in urls[1:]))
+        result = self.run_installer()
+        self.assertIn("https://mewplane.github.io/syauth/tutorials/first-unlock/", result.stdout)
+
     def test_latest_is_resolved_once_and_verified_before_apt(self):
         result = self.run_installer()
         self.assertEqual(result.returncode, 0, result.stderr)
