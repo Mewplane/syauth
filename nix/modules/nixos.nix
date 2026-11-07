@@ -10,6 +10,7 @@ let
   store = "/var/lib/syauth";
   account = config.users.users.${cfg.desktopUser} or { };
   pamModule = "${cfg.package}/lib/security/pam_syauth.so";
+  desktopUid = account.uid or null;
 
   anchorOrder =
     name:
@@ -75,7 +76,10 @@ in
 
       moduleArgs = lib.mkOption {
         type = lib.types.listOf lib.types.str;
-        default = [ ];
+        default = lib.optional (
+          desktopUid != null
+        ) "socket=/run/user/${toString desktopUid}/syauth/auth.sock";
+        defaultText = lib.literalExpression ''[ "socket=/run/user/<desktopUser UID>/syauth/auth.sock" ] when the UID is declared, otherwise [ ]'';
         example = [ "socket=/run/user/1000/syauth/auth.sock" ];
         description = "Arguments passed to pam_syauth.so in each selected service.";
       };
@@ -87,6 +91,10 @@ in
       {
         assertion = config.users.users ? ${cfg.desktopUser};
         message = "services.syauth.desktopUser must name an account declared in users.users.";
+      }
+      {
+        assertion = cfg.pam.services == [ ] || lib.any (lib.hasPrefix "socket=/") cfg.pam.moduleArgs;
+        message = "services.syauth.pam.moduleArgs requires an absolute socket= path when PAM is enabled. Declare users.users.<desktopUser>.uid or set pam.moduleArgs explicitly.";
       }
     ]
     ++ map (name: {

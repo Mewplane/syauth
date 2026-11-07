@@ -34,6 +34,23 @@ env:
   CARGO_INCREMENTAL: "0"
 
 jobs:
+  nix:
+    name: nix (package + module + VM)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v31
+        with:
+          enable_kvm: true
+          extra_nix_config: |
+            system-features = nixos-test big-parallel kvm
+            max-jobs = 2
+            cores = 2
+      - name: Check Nix formatting
+        run: nix --accept-flake-config fmt -- --check flake.nix nix/*.nix nix/modules/*.nix nix/tests/*.nix
+      - name: Build package, evaluate module, and boot the integration VM
+        run: nix --accept-flake-config flake check --no-write-lock-file --print-build-logs
+
   lint:
     name: lint (clippy + fmt + deny + scope-discipline)
     runs-on: ubuntu-latest

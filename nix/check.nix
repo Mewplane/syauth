@@ -70,6 +70,45 @@ let
       security.pam.services.sudo.text = "# pam_syauth.so\nauth required pam_unix.so\n";
     }
   ];
+  unknownUid = evaluate [
+    module
+    setup
+    {
+      users.users.${user}.uid = lib.mkForce null;
+      services.syauth.pam.services = [ "sudo" ];
+    }
+  ];
+  explicitSocket = evaluate [
+    module
+    setup
+    {
+      users.users.${user}.uid = lib.mkForce null;
+      services.syauth.pam = {
+        services = [ "sudo" ];
+        moduleArgs = [ socket ];
+      };
+    }
+  ];
+  emptyArgs = evaluate [
+    module
+    setup
+    {
+      services.syauth.pam = {
+        services = [ "sudo" ];
+        moduleArgs = [ ];
+      };
+    }
+  ];
+  relativeSocket = evaluate [
+    module
+    setup
+    {
+      services.syauth.pam = {
+        services = [ "sudo" ];
+        moduleArgs = [ "socket=auth.sock" ];
+      };
+    }
+  ];
   pamFailures =
     config:
     builtins.filter (a: !a.assertion && lib.hasInfix "lacks an auth rule" a.message) config.assertions;
@@ -91,4 +130,13 @@ assert builtins.elem "d /var/lib/syauth 0700 ${user} users -" enabled.systemd.tm
 assert lib.all hasRule services;
 assert pamFailures enabled == [ ] && builtins.length (pamFailures textOverride) == 1;
 assert (pam override "sudo").rules.auth.syauth.control == "required";
+assert (pam override "sudo").rules.auth.syauth.args == [ socket ];
+assert lib.any (a: !a.assertion && lib.hasInfix "absolute socket=" a.message) unknownUid.assertions;
+assert lib.any (a: !a.assertion && lib.hasInfix "absolute socket=" a.message) emptyArgs.assertions;
+assert lib.any (
+  a: !a.assertion && lib.hasInfix "absolute socket=" a.message
+) relativeSocket.assertions;
+assert lib.all (
+  a: a.assertion || !(lib.hasInfix "absolute socket=" a.message)
+) explicitSocket.assertions;
 pkgs.runCommand "syauth-nixos-module-check" { } "touch $out"

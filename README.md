@@ -72,7 +72,7 @@ Being nearby prepares the connection; each authentication still needs explicit a
 
 ## Development and contributing
 
-For a pinned Rust development environment, run `nix develop .`. Entering the shell also installs the repository's pre-commit hooks. Build from a checkout with `nix build .` and try the CLI with `nix run . -- --version`. Run `nix flake check .` to build the package and check the generated NixOS configuration; see [building with Nix](docs/how-to/install.md#with-nix) for details.
+For a pinned Rust development environment, run `nix develop .`. Entering the shell also installs the repository's pre-commit hooks. Build from a checkout with `nix build .` and try the CLI with `nix run . -- --version`. Run `nix flake check .` to build the package, check the generated NixOS configuration, and boot the installed-PAM integration VM (requires writable `/dev/kvm`); see [building with Nix](docs/how-to/install.md#with-nix) for details.
 
 The Rust workspace is under `crates/`; the Android app is under `syauth-android/`. Build from source with a toolchain compatible with the committed `Cargo.lock` and development packages for D-Bus, PAM, and Bluetooth:
 

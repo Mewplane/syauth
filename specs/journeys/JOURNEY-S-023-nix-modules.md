@@ -31,6 +31,15 @@ directory ownership, inert PAM defaults, and rules for the sudo-rs and Plasma
 services. It checks that an explicit PAM control reaches the generated rule.
 The Rust workspace still exercises the daemon binary against a fake radio.
 
+The booted `nix/tests/installation.nix` check additionally loads the installed
+PAM library through sudo and exercises the real daemon/socket with public
+synthetic Ed25519 responses. It verifies PAM-first audit ownership without a
+manual repair, generated socket arguments for UID 1100, explicit overrides,
+signature rejection, password fallback, account isolation, sudo-rs, profile
+installation/removal, and data preservation across disable/rollback. CI runs
+this VM alongside the package and module checks. Evaluation checks reject
+unknown UIDs without an explicit socket and reject an explicitly empty list.
+
 ## Implementation
 
 - `nix/modules/nixos.nix` declares the installation, user service and PAM rules.

@@ -131,8 +131,13 @@
           pkgs = pkgsFor system;
           module = self.nixosModules.default;
         };
+        nixos-vm = import ./nix/tests/installation.nix {
+          pkgs = pkgsFor system;
+          module = self.nixosModules.default;
+          package = self.packages.${system}.syauth;
+        };
       });
 
-      formatter = eachSystem (system: (pkgsFor system).nixfmt-rfc-style);
+      formatter = eachSystem (system: (pkgsFor system).nixfmt);
     };
 }

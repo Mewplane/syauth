@@ -1048,7 +1048,9 @@ sets up the CLI, private store, systemd user unit, and selected PAM rules.
   includes the flake input, module import, and settings.
 
 [Journey S-023](../journeys/JOURNEY-S-023-nix-modules.md) ·
-[Module](../../nix/modules/nixos.nix) · [Check](../../nix/check.nix)
+[Module](../../nix/modules/nixos.nix) · [Check](../../nix/check.nix) ·
+[Socket regression](../bugs/BUG-20261108-nix-pam-socket.md) ·
+[Installed-PAM VM](../../nix/tests/installation.nix)
 
 Verified by flake checks on x86-64 and by evaluation on ARM64. The module
 check covers the generated sudo-rs and Plasma PAM rules, and the rendered

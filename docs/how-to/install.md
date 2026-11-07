@@ -147,6 +147,10 @@ nix run . -- --version
 nix flake check .
 ```
 
+The flake check also boots a disposable NixOS VM and exercises the installed
+PAM library and daemon. Run it on Linux with writable `/dev/kvm`; it uses
+synthetic signing fixtures and does not require your phone or Bluetooth adapter.
+
 ### With Cargo
 
 Source builds additionally require a Rust toolchain compatible with `Cargo.lock`, a C toolchain, `pkg-config`, and development packages for D-Bus, PAM, and Bluetooth (`libdbus-1-dev`, `libpam0g-dev`, and `libbluetooth-dev` on Debian).
