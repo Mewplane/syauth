@@ -17,6 +17,8 @@ Documentation=https://github.com/dmytrogajewski/syauth/blob/master/specs/unlock-
 # locks ${XDG_RUNTIME_DIR}/syauth/presenced.pid (S-001), so the
 # XDG_RUNTIME_DIR must exist before the unit starts.
 ConditionPathIsDirectory=%t
+# Keep retrying while a controller is absent, including suspend and USB resets.
+StartLimitIntervalSec=0
 
 [Service]
 Type=simple
@@ -28,10 +30,7 @@ ExecStart=/usr/local/libexec/syauth-presenced
 # drops the pidfile lock + unlinks the pidfile + exits within ~1s.
 KillSignal=SIGTERM
 TimeoutStopSec=5
-# Restart on crash so a transient BlueZ adapter blip (S-003+) does
-# not require operator intervention. S-001 has no crash conditions
-# of its own; this setting is forward-looking for the BLE event loop
-# that arrives in S-003+.
+# Rebuild the GATT application and rotating advertisement after transport loss.
 Restart=on-failure
 RestartSec=2
 # Sandboxing aligned with SPEC §7 Security ("only the daemon's own

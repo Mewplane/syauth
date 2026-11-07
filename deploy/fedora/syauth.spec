@@ -43,6 +43,7 @@ BuildRequires:  rust >= 1.85
 BuildRequires:  pam-devel
 BuildRequires:  pkgconf-pkg-config
 BuildRequires:  bluez-libs-devel
+BuildRequires:  dbus-daemon
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  openssl-devel
 BuildRequires:  gzip

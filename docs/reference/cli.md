@@ -14,7 +14,7 @@ The desktop provides `syauth` for administration and `syauth-presenced` for the 
 
 `pair --force` replaces the application's existing peer record; it does not reset the Bluetooth system bond. `pair --yes` skips interactive confirmation and is intended for controlled test rigs. `--waybar` and `--yes` are mutually exclusive.
 
-`status --json` reports the daemon section in machine-readable form. A peer's `last_connect_ms_ago` is currently stamped by challenge activity, not a GATT connection event. Use notification subscription logs to establish readiness.
+`status --json` reports the daemon section in machine-readable form. A peer's `last_connect_ms_ago` is currently stamped by challenge activity, not a GATT connection event. `daemon.transport_ready` reports controller and advertisement health, sampled every two seconds. A missing or null value means the daemon cannot report transport health. This field does not report phone presence. Use notification subscription logs and an approved challenge to verify the phone connection.
 
 `doctor --skip-bluez`, `--skip-systemctl`, and `--skip-daemon` explicitly omit those probes for restricted environments. A skipped probe does not establish that its component works.
 

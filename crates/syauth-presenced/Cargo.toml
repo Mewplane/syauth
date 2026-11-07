@@ -127,3 +127,5 @@ time = { version = "0.3", features = ["macros"] }
 # transport's `Peripheral` trait talks `uuid::Uuid` and the rotation
 # audit short-hex render uses the same crate.
 uuid = { version = "1" }
+# Exercise the real BlueZ D-Bus boundary on a private bus, without a radio.
+zbus = { version = "5", default-features = false, features = ["tokio"] }

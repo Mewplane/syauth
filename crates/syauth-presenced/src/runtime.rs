@@ -79,6 +79,9 @@ pub enum RunError {
     /// failed (S-002 `ServeError`).
     #[error(transparent)]
     Serve(#[from] ServeError),
+    /// Bluetooth setup or advertising failed; systemd must rebuild transport.
+    #[error("Bluetooth transport unavailable: {0}")]
+    Transport(String),
 }
 
 /// Reason the daemon's main loop exited. Useful for tests that want
@@ -214,14 +217,14 @@ pub async fn run(config: Config) -> Result<ShutdownReason, RunError> {
     );
 
     let (orch_shutdown_tx, orch_shutdown_rx) = tokio::sync::oneshot::channel::<()>();
-    let (orch_task, reload_tx, orch_handle) = maybe_spawn_orchestrator(&config, orch_shutdown_rx).await;
+    let (orch_task, reload_tx, orch_handle) = maybe_spawn_orchestrator(&config, orch_shutdown_rx).await?;
 
     let (shutdown_tx, shutdown_rx) = tokio::sync::oneshot::channel::<()>();
     let serve_config = ServeConfig {
         socket_path: config.socket.clone(),
         expected_uid: config.expected_uid,
         reload_tx: reload_tx.clone(),
-        orchestrator: orch_handle,
+        orchestrator: orch_handle.clone(),
         test_fixed_nonce: config.test_fixed_nonce,
         started_at: Some(std::time::SystemTime::now()),
     };
@@ -234,12 +237,18 @@ pub async fn run(config: Config) -> Result<ShutdownReason, RunError> {
 
     let inotify_task = reload_tx.as_ref().map(|tx| spawn_inotify_watcher(&config.bonds_file, tx.clone()));
 
-    let reason = wait_for_reason(&mut sigterm, &mut sigint, &mut sighup, reload_tx.as_ref()).await;
-    tracing::info!(?reason, "shutdown signal received, draining");
+    let reason = tokio::select! {
+        reason = wait_for_reason(&mut sigterm, &mut sigint, &mut sighup, reload_tx.as_ref()) => Ok(reason),
+        error = wait_for_transport_failure(orch_handle.as_ref()) => Err(error),
+    };
+    tracing::info!(?reason, "draining daemon for signal or transport recovery");
     let _ = shutdown_tx.send(());
     let _ = orch_shutdown_tx.send(());
-    if let Some(handle) = orch_task {
-        let _ = handle.await;
+    if let Some(mut handle) = orch_task {
+        if tokio::time::timeout(TRANSPORT_HEALTH_INTERVAL, &mut handle).await.is_err() {
+            handle.abort();
+            let _ = handle.await;
+        }
     }
     if let Some(handle) = inotify_task {
         handle.abort();
@@ -259,8 +268,23 @@ pub async fn run(config: Config) -> Result<ShutdownReason, RunError> {
     // Drop runs here (function returns); the kernel releases the
     // F_OFD_SETLK lock and the pidfile is unlinked on the way out.
     drop(lock);
-    tracing::info!("syauth-presenced stopped cleanly");
-    Ok(reason)
+    tracing::info!("syauth-presenced transport and socket drained");
+    reason
+}
+
+/// Cadence for detecting a lost controller independently of minute rotation.
+const TRANSPORT_HEALTH_INTERVAL: Duration = Duration::from_secs(2);
+
+async fn wait_for_transport_failure(orchestrator: Option<&Arc<Orchestrator>>) -> RunError {
+    loop {
+        tokio::time::sleep(TRANSPORT_HEALTH_INTERVAL).await;
+        let Some(orchestrator) = orchestrator else {
+            return RunError::Transport("no transport running".into());
+        };
+        if let Err(err) = orchestrator.check_transport().await {
+            return RunError::Transport(err.to_string());
+        }
+    }
 }
 
 async fn wait_for_reason(
@@ -287,11 +311,10 @@ async fn wait_for_reason(
     }
 }
 
-/// Try to construct an [`Orchestrator`] over a [`PersistentPeripheral`]
-/// and spawn it. Returns `(None, None)` (and logs a `warn`) if no
-/// non-revoked bond exists, the key file is missing or malformed, or
-/// the BlueZ adapter cannot be opened — in any of those cases the
-/// daemon stays up with only the S-002 Unix-socket loop.
+/// Construct and spawn an orchestrator, including pairing with zero bonds.
+/// Bluetooth initialization failures propagate so systemd retries on the
+/// available controller. Store failures return an absent orchestrator, which
+/// the runtime health monitor also rejects.
 ///
 /// On success the orchestrator is constructed over the cold-start
 /// peer (a single bond for now; multi-peer hydration on cold start
@@ -308,16 +331,19 @@ async fn wait_for_reason(
 async fn maybe_spawn_orchestrator(
     config: &Config,
     shutdown: tokio::sync::oneshot::Receiver<()>,
-) -> (
-    Option<tokio::task::JoinHandle<()>>,
-    Option<mpsc::Sender<ReloadCommand>>,
-    Option<Arc<Orchestrator>>,
-) {
+) -> Result<
+    (
+        Option<tokio::task::JoinHandle<()>>,
+        Option<mpsc::Sender<ReloadCommand>>,
+        Option<Arc<Orchestrator>>,
+    ),
+    RunError,
+> {
     let store = match BondStore::load(&config.bonds_file) {
         Ok(s) => s,
         Err(err) => {
             warn_no_orchestrator(&format!("bonds.toml load failed: {err}"));
-            return (None, None, None);
+            return Ok((None, None, None));
         }
     };
     let first_active = store.list().iter().find(|b| matches!(b.status, BondStatus::Bonded)).cloned();
@@ -332,8 +358,7 @@ async fn maybe_spawn_orchestrator(
         PeripheralMode::Real => match PersistentPeripheral::new_default().await {
             Ok((p, rx)) => (p, Some(rx)),
             Err(err) => {
-                warn_no_orchestrator(&format!("BlueZ adapter open failed: {err}"));
-                return (None, None, None);
+                return Err(RunError::Transport(err.to_string()));
             }
         },
         PeripheralMode::Fake => (seed_fake_peripheral(config), None),
@@ -349,7 +374,7 @@ async fn maybe_spawn_orchestrator(
             Ok(k) => {
                 if let Err(err) = peripheral.add_peer(&b.peer_id, &k).await {
                     warn_no_orchestrator(&format!("peripheral add_peer failed: {err}"));
-                    return (None, None, None);
+                    return Ok((None, None, None));
                 }
                 seed_peers.push((b, k));
             }
@@ -396,7 +421,7 @@ async fn maybe_spawn_orchestrator(
     }
     let orchestrator_handle = Arc::clone(&orchestrator);
     let handle = tokio::spawn(Arc::clone(&orchestrator).run(shutdown));
-    (Some(handle), Some(reload_tx), Some(orchestrator_handle))
+    Ok((Some(handle), Some(reload_tx), Some(orchestrator_handle)))
 }
 
 /// Spawn a tokio task that hosts a `notify::recommended_watcher`
@@ -614,4 +639,21 @@ fn persist_pair_bond_record(bonds_path: &Path, bond: Bond) -> Result<(), syauth_
     store.add(bond)?;
     store.save(bonds_path)?;
     Ok(())
+}
+
+#[cfg(test)]
+mod recovery_tests {
+    use super::*;
+
+    #[test]
+    fn controller_absence_does_not_exhaust_systemd_restart_limit() {
+        let unit = include_str!("../dist/syauth-presenced.service");
+        assert!(unit.contains("StartLimitIntervalSec=0"));
+        assert!(unit.contains("Restart=on-failure"));
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn absent_transport_requests_supervised_restart() {
+        assert!(matches!(wait_for_transport_failure(None).await, RunError::Transport(_)));
+    }
 }
