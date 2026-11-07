@@ -21,7 +21,7 @@ Approve Linux authentication on your Android phone. syauth carries a fresh chall
 
 ## Install the release
 
-Install the desktop with `curl -fsSL https://mewplane.github.io/syauth/install.sh | sh`, then follow [installation and setup](how-to/install.md). The [published v0.2.0 assets](https://github.com/Mewplane/syauth/releases/tag/v0.2.0) include DEB/RPM/Arch packages for both CPU architectures, the [signed Android companion](https://github.com/Mewplane/syauth/releases/download/v0.2.0/syauth-0.2.0-android.apk), and [checksums](https://github.com/Mewplane/syauth/releases/download/v0.2.0/SHA256SUMS).
+Install the desktop with `curl -fsSL https://mewplane.github.io/syauth/install.sh | sh`, then follow [installation and setup](how-to/install.md). The [published v0.3.0 assets](https://github.com/Mewplane/syauth/releases/tag/v0.3.0) include DEB/RPM/Arch packages for both CPU architectures, the [signed Android companion](https://github.com/Mewplane/syauth/releases/download/v0.3.0/syauth-0.3.0-android.apk), and [checksums](https://github.com/Mewplane/syauth/releases/download/v0.3.0/SHA256SUMS).
 
 ## Follow one unlock
 
