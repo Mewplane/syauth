@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 #
-# Debian rules for syauth v0.1.0 (roadmap item S-021).
+# Debian rules for syauth v0.2.0 (roadmap item S-021).
 #
 # Driven by debhelper-compat 13. The build chain is hand-rolled (not
 # dh-cargo) because dh-cargo expects a single-crate package; syauth is
@@ -43,7 +43,7 @@ override_dh_auto_build:
 	# so the package surface is identical across distros.
 	mkdir -p debian/man
 	printf '%s\n' \
-	  '.TH SYAUTH 8 "2026-05-15" "syauth 0.1.0" "System Administration"' \
+	  '.TH SYAUTH 8 "2026-05-15" "syauth 0.2.0" "System Administration"' \
 	  '.SH NAME' \
 	  'syauth \- phone-as-key PAM authenticator for Linux' \
 	  '.SH SYNOPSIS' \

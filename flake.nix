@@ -109,12 +109,14 @@
               gnumake
               pkg-config
               dbus
+              openssl
               python3
               git
               cargo-audit
               cargo-deny
             ])
             ++ preCommit.enabledPackages;
+            LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [ pkgs.dbus ];
             inherit (preCommit) shellHook;
           };
         }

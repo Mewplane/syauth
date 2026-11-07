@@ -86,6 +86,6 @@ Two details matter when integrating:
 
 `denied` exists in the RPC taxonomy; the current phone Cancel wire value follows the `bad-signature` path. Socket or decoding failure also maps to unavailable. The surrounding PAM stack controls fallback and final access.
 
-Source: [UUIDs and session derivation](https://github.com/dmytrogajewski/syauth/blob/648375e/crates/syauth-transport/src/bluez.rs), [frame layout](https://github.com/dmytrogajewski/syauth/blob/648375e/crates/syauth-core/src/frame.rs), [challenge state machine](https://github.com/dmytrogajewski/syauth/blob/648375e/crates/syauth-presenced/src/orchestrator.rs), [RPC types](https://github.com/dmytrogajewski/syauth/blob/648375e/crates/syauth-presenced/src/rpc.rs), [PAM mapping](https://github.com/dmytrogajewski/syauth/blob/648375e/crates/syauth-pam/src/auth.rs).
+Source: [UUIDs and session derivation](https://github.com/Mewplane/syauth/blob/648375e/crates/syauth-transport/src/bluez.rs), [frame layout](https://github.com/Mewplane/syauth/blob/648375e/crates/syauth-core/src/frame.rs), [challenge state machine](https://github.com/Mewplane/syauth/blob/648375e/crates/syauth-presenced/src/orchestrator.rs), [RPC types](https://github.com/Mewplane/syauth/blob/648375e/crates/syauth-presenced/src/rpc.rs), [PAM mapping](https://github.com/Mewplane/syauth/blob/648375e/crates/syauth-pam/src/auth.rs).
 
 <!-- Structure: Diátaxis reference; original prose for syauth. -->

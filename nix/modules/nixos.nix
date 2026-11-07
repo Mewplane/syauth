@@ -103,6 +103,7 @@ in
       unitConfig = {
         ConditionUser = cfg.desktopUser;
         ConditionPathIsDirectory = "%t";
+        StartLimitIntervalSec = 0;
       };
       serviceConfig = {
         ExecStart = "${cfg.package}/bin/syauth-presenced";

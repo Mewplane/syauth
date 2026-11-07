@@ -35,3 +35,6 @@ runs the Rust workspace suite.
 ## Traceability
 
 [Step S-022](../syauth/ROADMAP.md#step-s-022-nix-flake)
+
+[Nix compatibility regression](../bugs/BUG-20261107-1417.md) records the
+current release's package and development-shell test dependencies.

@@ -167,6 +167,8 @@ pub enum DaemonProbeState {
     /// timeout; the daemon's per-peer rows + boot wall-clock time
     /// are carried in.
     Up {
+        /// Live controller and advertisement readiness, if supported by the daemon.
+        transport_ready: Option<bool>,
         /// Boot wall-clock time the daemon reported. Serialized as
         /// epoch seconds on the JSON path for non-Rust consumers.
         #[serde(with = "epoch_seconds")]
@@ -549,7 +551,15 @@ fn probe_daemon(socket: &Path) -> DaemonProbeState {
         };
     }
     match read_frame_blocking::<_, Response>(&mut stream) {
-        Ok(Response::Status { peers, started_at }) => DaemonProbeState::Up { started_at, peers },
+        Ok(Response::Status {
+            peers,
+            started_at,
+            transport_ready,
+        }) => DaemonProbeState::Up {
+            started_at,
+            peers,
+            transport_ready,
+        },
         Ok(_) => DaemonProbeState::Down {
             reason: "unexpected-response".to_owned(),
         },
@@ -576,7 +586,7 @@ fn connect_error_reason(err: &io::Error) -> String {
 /// so a daemon-down case is never a silent empty section.
 pub fn write_daemon_section(writer: &mut dyn Write, report: &CliStatusReport) -> Result<(), StatusError> {
     match &report.daemon {
-        DaemonProbeState::Up { started_at, peers } => {
+        DaemonProbeState::Up { started_at, peers, .. } => {
             let ts = format_rfc3339(*started_at);
             writeln!(writer, "daemon=up started_at={ts}")?;
             writeln!(

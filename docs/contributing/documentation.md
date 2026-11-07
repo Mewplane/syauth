@@ -22,7 +22,7 @@ target/docs-venv/bin/python -m playwright install chromium
 target/docs-venv/bin/python scripts/docs-check.py
 ```
 
-The generated site lives in `target/docs-site/`, outside the source tree. Linux environments may need Playwright's browser system dependencies; its installer reports missing libraries. CI builds and checks pull requests. On `master`, the workflow copies the shell installer to the site root and deploys the checked output to [GitHub Pages](https://dmytrogajewski.github.io/syauth/). Running the preview or checks locally does not publish a site.
+The generated site lives in `target/docs-site/`, outside the source tree. Linux environments may need Playwright's browser system dependencies; its installer reports missing libraries. CI builds and checks pull requests. On `master`, the workflow copies the shell installer to the site root and deploys the checked output to [GitHub Pages](https://mewplane.github.io/syauth/). Running the preview or checks locally does not publish a site.
 
 ## Choose the right page
 

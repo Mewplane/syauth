@@ -35,7 +35,7 @@ def prepare(directory, version, revision):
         artifacts.append({"name": path.name, "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
                           "size": path.stat().st_size})
     manifest = {"version": version, "tag": "v" + version, "source_revision": revision,
-                "repository": "dmytrogajewski/syauth", "linux_glibc_minimum": "2.36",
+                "repository": "Mewplane/syauth", "linux_glibc_minimum": "2.36",
                 "artifacts": artifacts}
     (directory / "release.json").write_text(json.dumps(manifest, indent=2) + "\n")
     artifacts.append({"name": "release.json", "sha256": hashlib.sha256((directory / "release.json").read_bytes()).hexdigest()})

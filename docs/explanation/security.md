@@ -24,7 +24,7 @@ The phone requests a Keystore signing key with per-use strong biometric authenti
 | Socket peer check | Socket mode `0600` inside the user's runtime directory; unexpected peer credentials are warned about but accepted | Filesystem access control is the active barrier; do not claim strict UID rejection |
 | Expiry and cancellation | Desktop deadline without authenticated phone cancellation | A stale prompt may remain after the caller has stopped waiting |
 
-These are existing mismatches and limitations; the documentation work does not approve a SPEC deviation or change any production behavior. The historical [known-gaps ledger](https://github.com/dmytrogajewski/syauth/blob/master/docs/known-gaps.md) and [design specification](https://github.com/dmytrogajewski/syauth/blob/master/specs/syauth/SPEC.md) provide design context, not proof that every property is present in the runtime path.
+These are existing mismatches and limitations; the documentation work does not approve a SPEC deviation or change any production behavior. The historical [known-gaps ledger](https://github.com/Mewplane/syauth/blob/master/docs/known-gaps.md) and [design specification](https://github.com/Mewplane/syauth/blob/master/specs/syauth/SPEC.md) provide design context, not proof that every property is present in the runtime path.
 
 ## Relay and unwanted approval
 
@@ -44,6 +44,6 @@ Keep desktop key files private and do not copy them into logs or issue reports. 
 
 If you lose a phone, [revoke its application bond](../how-to/pair-and-revoke.md#revoke-a-phone) and remove the OS association when possible. Revoked records are retained for history and excluded from active daemon peers.
 
-Source: [public-input bond derivation](https://github.com/dmytrogajewski/syauth/blob/648375e/crates/syauth-core/src/bond.rs), [challenge verification](https://github.com/dmytrogajewski/syauth/blob/648375e/crates/syauth-presenced/src/orchestrator.rs), [socket admission](https://github.com/dmytrogajewski/syauth/blob/648375e/crates/syauth-presenced/src/server.rs), [PAM handler](https://github.com/dmytrogajewski/syauth/blob/648375e/crates/syauth-pam/src/auth.rs), [Android challenge callback](https://github.com/dmytrogajewski/syauth/blob/648375e/syauth-android/app/src/main/kotlin/com/sy/syauth/android/bg/SyauthCompanionService.kt).
+Source: [public-input bond derivation](https://github.com/Mewplane/syauth/blob/648375e/crates/syauth-core/src/bond.rs), [challenge verification](https://github.com/Mewplane/syauth/blob/648375e/crates/syauth-presenced/src/orchestrator.rs), [socket admission](https://github.com/Mewplane/syauth/blob/648375e/crates/syauth-presenced/src/server.rs), [PAM handler](https://github.com/Mewplane/syauth/blob/648375e/crates/syauth-pam/src/auth.rs), [Android challenge callback](https://github.com/Mewplane/syauth/blob/648375e/syauth-android/app/src/main/kotlin/com/sy/syauth/android/bg/SyauthCompanionService.kt).
 
 <!-- Structure: Diátaxis explanation; original prose for syauth. -->

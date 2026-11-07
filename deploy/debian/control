@@ -10,11 +10,12 @@ Build-Depends: debhelper-compat (= 13),
                libsecret-1-dev,
                libssl-dev,
                pkg-config,
+               dbus-daemon,
                gzip
 Standards-Version: 4.6.2
-Homepage: https://github.com/sy/syauth
-Vcs-Browser: https://github.com/sy/syauth
-Vcs-Git: https://github.com/sy/syauth.git
+Homepage: https://github.com/Mewplane/syauth
+Vcs-Browser: https://github.com/Mewplane/syauth
+Vcs-Git: https://github.com/Mewplane/syauth.git
 Rules-Requires-Root: no
 
 Package: syauth

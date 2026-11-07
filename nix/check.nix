@@ -86,6 +86,7 @@ let
 in
 assert noPam.security.pam.services.sudo.text == baseline.security.pam.services.sudo.text;
 assert unit.unitConfig.ConditionUser == user && builtins.elem "default.target" unit.wantedBy;
+assert unit.unitConfig.StartLimitIntervalSec == 0;
 assert builtins.elem "d /var/lib/syauth 0700 ${user} users -" enabled.systemd.tmpfiles.rules;
 assert lib.all hasRule services;
 assert pamFailures enabled == [ ] && builtins.length (pamFailures textOverride) == 1;

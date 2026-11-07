@@ -95,6 +95,10 @@ pub enum Response {
     /// Outcome of `Request::Status`. S-002 ships the wire shape with
     /// an empty `peers` list; S-017 fills in the per-peer columns.
     Status {
+        /// Advertising and controller health, independent of phone presence.
+        /// Missing for daemons predating transport health reporting.
+        #[serde(default)]
+        transport_ready: Option<bool>,
         /// Per-peer liveness rows.
         peers: Vec<PeerStatus>,
         /// Daemon boot wall-clock time (UTC). Serialized as the
@@ -382,8 +386,27 @@ mod tests {
     }
 
     #[test]
+    fn legacy_status_has_unknown_transport_health() {
+        #[derive(Serialize)]
+        struct LegacyStatus {
+            kind: &'static str,
+            peers: Vec<PeerStatus>,
+            started_at: u64,
+        }
+        let bytes = encode_frame(&LegacyStatus {
+            kind: "status",
+            peers: vec![],
+            started_at: 0,
+        })
+        .expect("encode");
+        let response: Response = read_frame_blocking(&mut std::io::Cursor::new(bytes)).expect("legacy decode");
+        assert!(matches!(response, Response::Status { transport_ready: None, .. }));
+    }
+
+    #[test]
     fn response_status_roundtrips() {
         let original = Response::Status {
+            transport_ready: Some(true),
             peers: vec![PeerStatus {
                 peer_id: "peer-a".to_string(),
                 last_challenge_ms_ago: Some(42_000),

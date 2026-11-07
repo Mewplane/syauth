@@ -9,6 +9,7 @@
   dbus,
   python3,
   rustToolchain,
+  writeShellScriptBin,
 }:
 
 let
@@ -58,6 +59,19 @@ rustPlatform.buildRustPackage {
   cargoBuildFlags = [ "--workspace" ];
   cargoTestFlags = [ "--workspace" ];
   doCheck = true;
+  # The recovery test starts a session bus; the sandbox has no /etc/dbus-1.
+  nativeCheckInputs = [
+    (writeShellScriptBin "dbus-daemon" ''
+      args=()
+      for arg in "$@"; do
+        case "$arg" in
+          --session) args+=(--config-file=${dbus}/share/dbus-1/session.conf) ;;
+          *) args+=("$arg") ;;
+        esac
+      done
+      exec ${dbus}/bin/dbus-daemon "''${args[@]}"
+    '')
+  ];
 
   # The upstream integration test expects the daemon directly under target/release.
   #
@@ -81,7 +95,7 @@ rustPlatform.buildRustPackage {
 
   meta = {
     description = "Phone-as-key unlock for Linux PAM";
-    homepage = "https://github.com/sy/syauth";
+    homepage = "https://github.com/Mewplane/syauth";
     license = lib.licenses.mit;
     platforms = lib.platforms.linux;
     mainProgram = "syauth";

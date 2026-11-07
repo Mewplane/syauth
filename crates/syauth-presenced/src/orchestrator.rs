@@ -24,7 +24,10 @@
 use std::{
     collections::{BTreeMap, HashMap, HashSet, VecDeque},
     path::{Path, PathBuf},
-    sync::Arc,
+    sync::{
+        Arc,
+        atomic::{AtomicBool, Ordering},
+    },
     time::{Duration as StdDuration, SystemTime, UNIX_EPOCH},
 };
 
@@ -393,6 +396,7 @@ pub struct ReloadCommand {
 /// minimal `add_peer` / `remove_peer` calls before re-publishing the
 /// fresh UUID union.
 pub struct Orchestrator {
+    transport_ready: AtomicBool,
     peripheral: Arc<dyn Peripheral + Send + Sync>,
     /// In-memory mirror of the live peer set keyed by `peer_id`.
     /// `BTreeMap` so iteration order is deterministic across runs
@@ -551,6 +555,7 @@ impl Orchestrator {
         let (reload_tx, reload_rx) = mpsc::channel(RELOAD_CHANNEL_CAPACITY);
         Self {
             peripheral,
+            transport_ready: AtomicBool::new(false),
             peers: tokio::sync::Mutex::new(map),
             bonds_file,
             keys_dir,
@@ -559,6 +564,32 @@ impl Orchestrator {
             audit_log: TokioMutex::new(audit_log),
             start,
         }
+    }
+
+    /// True after successful advertising and while transport health checks pass.
+    #[must_use]
+    pub fn transport_ready(&self) -> bool {
+        self.transport_ready.load(Ordering::Acquire)
+    }
+
+    /// Bound health probing so an unresponsive BlueZ cannot stall recovery.
+    pub async fn check_transport(&self) -> Result<(), PeripheralError> {
+        let result = match tokio::time::timeout(StdDuration::from_secs(1), self.peripheral.check_health()).await {
+            Ok(result) => result,
+            Err(_) => Err(PeripheralError::Backend {
+                reason: "transport health probe timed out".into(),
+            }),
+        };
+        if result.is_err() {
+            self.transport_ready.store(false, Ordering::Release);
+        }
+        result?;
+        if !self.transport_ready() {
+            return Err(PeripheralError::Backend {
+                reason: "advertising unavailable".into(),
+            });
+        }
+        Ok(())
     }
 
     /// Attach an audit-log appender after construction. Returns the
@@ -634,7 +665,9 @@ impl Orchestrator {
         let minute = minute_index(now);
         let snapshot = self.snapshot_peers().await;
         let union = build_uuid_union(&snapshot, minute);
-        match self.peripheral.set_session_uuids(union.clone()).await {
+        let result = self.peripheral.set_session_uuids(union.clone()).await;
+        self.transport_ready.store(result.is_ok(), Ordering::Release);
+        match result {
             Ok(()) => {
                 for (peer_id, _) in &snapshot {
                     let uuid_bytes = session_uuid_for(snapshot_key(&snapshot, peer_id), minute);

@@ -6,7 +6,7 @@ set -euo pipefail
 : "${SYAUTH_RELEASE_KEYSTORE:?SYAUTH_RELEASE_KEYSTORE is required}"
 : "${SYAUTH_RELEASE_KEYSTORE_PASSWORD:?SYAUTH_RELEASE_KEYSTORE_PASSWORD is required}"
 
-VERSION="${VERSION:-0.1.0}"
+VERSION="${VERSION:-0.2.0}"
 if [[ ! "$VERSION" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
     echo "Error: VERSION must be a numeric major.minor.patch" >&2
     exit 1

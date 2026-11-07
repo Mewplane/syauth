@@ -45,7 +45,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
-val releaseVersion = providers.environmentVariable("VERSION").orElse("0.1.0").get()
+val releaseVersion = providers.environmentVariable("VERSION").orElse("0.2.0").get()
 require(Regex("(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)").matches(releaseVersion)) {
     "VERSION must be a numeric major.minor.patch"
 }

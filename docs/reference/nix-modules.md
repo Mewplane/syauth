@@ -3,6 +3,9 @@
 Import `nixosModules.default` to configure syauth for one desktop account.
 See the [NixOS setup example](../how-to/install.md#configure-nixos).
 
+The user service restarts after transport failure without a start-rate limit,
+matching the upstream service's recovery policy when a controller disappears.
+
 | Option under `services.syauth` | Default | Purpose |
 | --- | --- | --- |
 | `enable` | `false` | Install syauth and declare the user service. |

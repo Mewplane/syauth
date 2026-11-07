@@ -31,6 +31,7 @@
 //! refactored by S-003 — it remains byte-identical until S-009 deletes
 //! it. The library API is a strict superset.
 
+mod health;
 mod notification;
 
 use std::{collections::HashMap, sync::Arc, time::Duration};
@@ -192,6 +193,11 @@ impl From<TransportError> for PeripheralError {
 /// method.
 #[async_trait]
 pub trait Peripheral: Send + Sync {
+    /// Check controller and advertising health independently of phone presence.
+    async fn check_health(&self) -> Result<(), PeripheralError> {
+        Ok(())
+    }
+
     /// Register a bonded peer's challenge + response characteristics
     /// with the long-lived GATT application.
     ///
@@ -287,6 +293,7 @@ pub struct PersistentPeripheral {
     /// to `bluetoothd`). Held so the adapter and the application stay
     /// alive for the lifetime of the daemon.
     _session: bluer::Session,
+    adapter_lifetime: health::AdapterLifetime,
     /// Adapter the peripheral operates on (e.g. `hci0`).
     adapter: bluer::Adapter,
     /// Live GATT application registration. Replaced on every
@@ -412,7 +419,12 @@ impl PersistentPeripheral {
         // concurrent retries without back-pressuring the BlueZ
         // GATT-write thread.
         let (pair_event_tx, pair_event_rx) = mpsc::channel::<([u8; PAIR_PUBKEY_LEN], [u8; PAIR_PUBKEY_LEN])>(8);
+        let events = session.events().await.map_err(|err| PeripheralError::Backend {
+            reason: format!("adapter lifecycle subscription: {err}"),
+        })?;
+        let adapter_lifetime = health::AdapterLifetime::watch(events, adapter_id.to_owned());
         let peripheral = Arc::new(Self {
+            adapter_lifetime,
             _session: session,
             adapter,
             app_handle: Mutex::new(None),
@@ -819,6 +831,28 @@ impl PersistentPeripheral {
 
 #[async_trait]
 impl Peripheral for PersistentPeripheral {
+    async fn check_health(&self) -> Result<(), PeripheralError> {
+        if self.adapter_lifetime.is_lost() {
+            return Err(PeripheralError::Backend {
+                reason: "registered controller was removed".into(),
+            });
+        }
+        // Serialize against advertisement replacement to avoid observing its gap.
+        let advertisement = self.adv_slot.lock().await;
+        let probe =
+            async { Ok::<_, bluer::Error>(self.adapter.is_powered().await? && self.adapter.active_advertising_instances().await? > 0) }
+                .await
+                .map_err(|err| PeripheralError::Backend {
+                    reason: format!("controller health: {err}"),
+                })?;
+        if advertisement.is_none() || !probe {
+            return Err(PeripheralError::Backend {
+                reason: "controller or advertisement unavailable".into(),
+            });
+        }
+        Ok(())
+    }
+
     async fn add_peer(&self, peer_id: &str, bond_key: &BondKey) -> Result<(), PeripheralError> {
         let peers = self.peers.lock().await;
         if peers.contains_key(peer_id) {
@@ -937,6 +971,7 @@ impl Peripheral for PersistentPeripheral {
 #[cfg(any(test, feature = "test-fake"))]
 #[derive(Default)]
 struct FakeState {
+    transport_failed: bool,
     /// Peers in insertion order so tests can assert on the order
     /// after a `remove_peer` in the middle of the sequence.
     peers_in_order: Vec<String>,
@@ -971,6 +1006,11 @@ pub struct FakePeripheral {
 
 #[cfg(any(test, feature = "test-fake"))]
 impl FakePeripheral {
+    /// Simulate controller loss without changing the bonded peer set.
+    pub fn set_transport_failed(&self, failed: bool) {
+        self.lock_state().transport_failed = failed;
+    }
+
     /// Construct a fresh `FakePeripheral` with no peers, no advertised
     /// UUIDs, and no recorded calls.
     #[must_use]
@@ -1049,6 +1089,15 @@ impl Default for FakePeripheral {
 #[cfg(any(test, feature = "test-fake"))]
 #[async_trait]
 impl Peripheral for FakePeripheral {
+    async fn check_health(&self) -> Result<(), PeripheralError> {
+        if self.lock_state().transport_failed {
+            return Err(PeripheralError::Backend {
+                reason: "controller removed".into(),
+            });
+        }
+        Ok(())
+    }
+
     async fn add_peer(&self, peer_id: &str, bond_key: &BondKey) -> Result<(), PeripheralError> {
         let mut state = self.lock_state();
         if state.peer_keys.contains_key(peer_id) {
@@ -1074,6 +1123,11 @@ impl Peripheral for FakePeripheral {
 
     async fn set_session_uuids(&self, uuids: std::collections::HashSet<Uuid>) -> Result<(), PeripheralError> {
         let mut state = self.lock_state();
+        if state.transport_failed {
+            return Err(PeripheralError::Backend {
+                reason: "controller removed".into(),
+            });
+        }
         state.session_uuid_calls.push(uuids);
         Ok(())
     }

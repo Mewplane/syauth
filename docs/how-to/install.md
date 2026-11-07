@@ -17,7 +17,7 @@ Before enabling PAM, read [security boundaries](../explanation/security.md). Kee
 Install the latest release with your native package manager:
 
 ```sh
-curl -fsSL https://dmytrogajewski.github.io/syauth/install.sh | sh
+curl -fsSL https://mewplane.github.io/syauth/install.sh | sh
 ```
 
 The POSIX shell installer reads your distribution and architecture, resolves one GitHub release tag, downloads that tag's package and `SHA256SUMS`, checks the exact package digest, then invokes `apt`, `dnf`, `zypper`, or `pacman`. It requests `sudo` when necessary. An unsupported system or checksum mismatch stops installation. It does not change PAM stacks, enable services, or change existing bond ownership.
@@ -25,31 +25,31 @@ The POSIX shell installer reads your distribution and architecture, resolves one
 To inspect the script, select a version, or preview package selection:
 
 ```sh
-curl -fsSLo install-syauth.sh https://dmytrogajewski.github.io/syauth/install.sh
+curl -fsSLo install-syauth.sh https://mewplane.github.io/syauth/install.sh
 less install-syauth.sh
-sh install-syauth.sh --version 0.1.0 --dry-run
-sh install-syauth.sh --version 0.1.0
+sh install-syauth.sh --version 0.2.0 --dry-run
+sh install-syauth.sh --version 0.2.0
 ```
 
 ### Direct downloads
 
-The [v0.1.0 release](https://github.com/dmytrogajewski/syauth/releases/tag/v0.1.0) has the native packages, manual archives, source, signed APK, and checksums. For example, on Debian/Ubuntu x86_64:
+The [v0.2.0 release](https://github.com/Mewplane/syauth/releases/tag/v0.2.0) has the native packages, manual archives, source, signed APK, and checksums. For example, on Debian/Ubuntu x86_64:
 
 ```sh
-release=https://github.com/dmytrogajewski/syauth/releases/download/v0.1.0
-curl -fSLO "$release/syauth_0.1.0_amd64.deb"
+release=https://github.com/Mewplane/syauth/releases/download/v0.2.0
+curl -fSLO "$release/syauth_0.2.0_amd64.deb"
 curl -fSLO "$release/SHA256SUMS"
 sha256sum --check --ignore-missing SHA256SUMS
-sudo apt install ./syauth_0.1.0_amd64.deb
+sudo apt install ./syauth_0.2.0_amd64.deb
 ```
 
 Choose the corresponding artifact for other native managers, verify it against the same checksum file, then install it:
 
 | System | x86_64 artifact | Install command |
 | --- | --- | --- |
-| Fedora | `syauth-0.1.0-4.x86_64.rpm` | `sudo dnf install ./syauth-0.1.0-4.x86_64.rpm` |
-| openSUSE | `syauth-0.1.0-4.x86_64.rpm` | `sudo zypper install --allow-unsigned-rpm ./syauth-0.1.0-4.x86_64.rpm` |
-| Arch | `syauth-0.1.0-1-x86_64.pkg.tar.zst` | `sudo pacman -U ./syauth-0.1.0-1-x86_64.pkg.tar.zst` |
+| Fedora | `syauth-0.2.0-4.x86_64.rpm` | `sudo dnf install ./syauth-0.2.0-4.x86_64.rpm` |
+| openSUSE | `syauth-0.2.0-4.x86_64.rpm` | `sudo zypper install --allow-unsigned-rpm ./syauth-0.2.0-4.x86_64.rpm` |
+| Arch | `syauth-0.2.0-1-x86_64.pkg.tar.zst` | `sudo pacman -U ./syauth-0.2.0-1-x86_64.pkg.tar.zst` |
 
 For ARM64, use the DEB ending in `_arm64.deb`, or the RPM/Arch filename with `aarch64` replacing `x86_64`. The RPM is checksum-verified rather than RPM-signed; the openSUSE command permits that local unsigned RPM without disabling repository checks. These are downloadable native packages, not registered APT/DNF repositories or an AUR listing. Repeat the shell installer to fetch and install a newer release.
 
@@ -60,7 +60,7 @@ Packages install `/usr/bin/syauth`, `/usr/libexec/syauth-presenced`, the distrib
 On x86-64 or ARM64 Linux with flakes enabled:
 
 ```sh
-nix profile install github:dmytrogajewski/syauth
+nix profile install github:Mewplane/syauth
 syauth --version
 ```
 
@@ -88,7 +88,7 @@ Add the input and module to your NixOS `flake.nix`:
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     syauth = {
-      url = "github:dmytrogajewski/syauth";
+      url = "github:Mewplane/syauth";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -134,7 +134,7 @@ make test
 make lint
 ```
 
-The shell provides pinned Rust and pre-commit hooks;
+The shell provides pinned Rust, D-Bus test dependencies, OpenSSL, and pre-commit hooks;
 [nix-direnv](https://github.com/nix-community/nix-direnv) users can run
 `direnv allow` for automatic loading. The flake declares the nix-community
 Cachix cache.
@@ -206,14 +206,14 @@ The `--dry-run` command **writes the unit file** but skips the binary copy and `
 
 ## Install the Android app
 
-Download the [signed Android APK](https://github.com/dmytrogajewski/syauth/releases/download/v0.1.0/syauth-0.1.0-android.apk) and [SHA256SUMS](https://github.com/dmytrogajewski/syauth/releases/download/v0.1.0/SHA256SUMS). Verify the downloaded file before opening it on your phone, or install it with ADB:
+Download the [signed Android APK](https://github.com/Mewplane/syauth/releases/download/v0.2.0/syauth-0.2.0-android.apk) and [SHA256SUMS](https://github.com/Mewplane/syauth/releases/download/v0.2.0/SHA256SUMS). Verify the downloaded file before opening it on your phone, or install it with ADB:
 
 ```sh
 sha256sum --check --ignore-missing SHA256SUMS
-adb install -r syauth-0.1.0-android.apk
+adb install -r syauth-0.2.0-android.apk
 ```
 
-With Android SDK Build Tools installed, verify the signature using `apksigner verify --verbose --print-certs syauth-0.1.0-android.apk`. Compare its SHA-256 certificate digest with the [published release signing identity](../contributing/releases.md#android-builds-and-signing). The private signing key is retained across releases. A debug APK uses a different identity and must be uninstalled before installing this release; uninstalling removes its local app data and requires pairing again.
+With Android SDK Build Tools installed, verify the signature using `apksigner verify --verbose --print-certs syauth-0.2.0-android.apk`. Compare its SHA-256 certificate digest with the [published release signing identity](../contributing/releases.md#android-builds-and-signing). The private signing key is retained across releases. A debug APK uses a different identity and must be uninstalled before installing this release; uninstalling removes its local app data and requires pairing again.
 
 To build from source, provide Android SDK platform 34, JDK 21, NDK 28.0.13004108, cargo-ndk 4.1.2, and the four Rust Android targets required by `scripts/build_aar.sh`. Its checked-in helper generates the matching UniFFI 0.29.5 bindings.
 
