@@ -27,8 +27,21 @@
 //!
 //! Every step is a flat early-return; no helper hides a branch.
 
-use std::{fs::OpenOptions, io::Write, os::unix::net::UnixStream, path::Path, time::Duration};
+use std::{
+    fs::OpenOptions,
+    io::Write,
+    os::{
+        fd::AsRawFd as _,
+        unix::{
+            fs::{MetadataExt as _, OpenOptionsExt as _},
+            net::UnixStream,
+        },
+    },
+    path::Path,
+    time::Duration,
+};
 
+use nix::unistd::{Gid, Uid, fchown};
 use syauth_core::{Bond, BondError, BondStatus, BondStore, NONCE_LEN};
 use syauth_presenced::{
     OUTCOME_REASON_BAD_SIGNATURE, OUTCOME_REASON_BUSY, OUTCOME_REASON_DENIED, OUTCOME_REASON_OK, OUTCOME_REASON_REPLAY,
@@ -88,6 +101,8 @@ const LAST_LOG_VERB_SUCCESS: &str = "success";
 
 /// `last.log` verb for any failure outcome.
 const LAST_LOG_VERB_FAILURE: &str = "failure";
+
+const LAST_LOG_FILE_MODE: u32 = 0o600;
 
 /// Placeholder peer id used in the `last.log` line when authentication
 /// failed before a peer could be identified (e.g. empty bond store).
@@ -422,7 +437,20 @@ fn append_last_log(cfg: &Config, outcome: &AuthOutcome) -> std::io::Result<()> {
     if let Some(parent) = cfg.last_log_path().parent() {
         let _ = std::fs::create_dir_all(parent);
     }
-    let mut f = OpenOptions::new().create(true).append(true).open(cfg.last_log_path())?;
+    let path = cfg.last_log_path();
+    let mut options = OpenOptions::new();
+    options.append(true).mode(LAST_LOG_FILE_MODE).custom_flags(libc::O_NOFOLLOW);
+    let mut f = match options.create_new(true).open(&path) {
+        Ok(file) => {
+            // PAM may run as root before the desktop daemon creates the log.
+            // Assign only our exclusively created inode, never an existing path.
+            let owner = std::fs::metadata(&cfg.bond_dir)?;
+            fchown(file.as_raw_fd(), Some(Uid::from_raw(owner.uid())), Some(Gid::from_raw(owner.gid())))?;
+            file
+        }
+        Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => options.create_new(false).open(&path)?,
+        Err(error) => return Err(error),
+    };
     writeln!(f, "{ts} {verb} {peer_id}")?;
     Ok(())
 }
@@ -765,6 +793,9 @@ mod tests {
             peer_id: "deadbeef".to_string(),
         };
         append_last_log(&cfg, &outcome).expect("append ok");
+        // BUG-20261108-audit-ownership: a PAM-first log stays private.
+        use std::os::unix::fs::MetadataExt as _;
+        assert_eq!(std::fs::metadata(cfg.last_log_path()).expect("stat").mode() & 0o777, 0o600);
         let content = std::fs::read_to_string(cfg.last_log_path()).expect("read");
         assert!(content.contains(" success deadbeef"), "got: {content}");
         let lines: Vec<_> = content.lines().collect();
@@ -783,6 +814,19 @@ mod tests {
         append_last_log(&cfg, &outcome).expect("append ok");
         let content = std::fs::read_to_string(cfg.last_log_path()).expect("read");
         assert!(content.contains(&format!(" failure {LAST_LOG_UNKNOWN_PEER}")), "got: {content}");
+    }
+
+    /// A user-controlled symlink must not redirect privileged audit writes.
+    #[test]
+    fn last_log_rejects_a_symbolic_link() {
+        let tmp = tempfile::tempdir().expect("tempdir");
+        let target = tmp.path().join("untouched");
+        std::fs::write(&target, "original\n").expect("target");
+        let cfg = Config::for_tests(tmp.path());
+        std::os::unix::fs::symlink(&target, cfg.last_log_path()).expect("symlink");
+        let outcome = AuthOutcome::Success { peer_id: "test".into() };
+        assert!(append_last_log(&cfg, &outcome).is_err());
+        assert_eq!(std::fs::read_to_string(target).expect("read target"), "original\n");
     }
 
     /// first_bonded prefers the first non-revoked peer.

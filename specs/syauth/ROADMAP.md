@@ -1060,4 +1060,5 @@ These are explicitly **not** part of v0.1 per SPEC §3.3; tracked here so they a
 
 ## Changelog
 
+- 2026-11-08: [PAM-first audit ownership regression](../bugs/BUG-20261108-audit-ownership.md): private creation owned by the bond-store account, with a privileged tempdir regression test.
 - 2026-05-14: Initial roadmap drafted from SPEC.md by `/roadmap`. All items pending.
