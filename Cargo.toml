@@ -27,7 +27,7 @@ edition = "2024"
 rust-version = "1.85"
 license = "MIT"
 authors = ["syauth contributors"]
-repository = "https://github.com/sy/syauth"
+repository = "https://github.com/Mewplane/syauth"
 
 [workspace.lints.rust]
 unsafe_code = "deny"

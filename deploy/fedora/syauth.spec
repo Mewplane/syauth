@@ -23,7 +23,7 @@ Release:        %{rpm_release}%{?dist}
 Summary:        Phone-as-key PAM authenticator for Linux
 
 License:        MIT
-URL:            https://github.com/sy/syauth
+URL:            https://github.com/Mewplane/syauth
 Source0:        %{name}-%{version}.tar.gz
 
 # Cross-reference: deploy/version.env, /Cargo.toml [workspace.package].
