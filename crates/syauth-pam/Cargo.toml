@@ -41,7 +41,7 @@ time = { version = "0.3", features = ["formatting", "parsing"] }
 thiserror = "2"
 # `nix::unistd::geteuid` for the `/run/user/$UID` fallback when
 # `XDG_RUNTIME_DIR` is unset (SPEC §8 Risks row).
-nix = { version = "0.29", features = ["user"] }
+nix = { version = "0.29", features = ["user", "fs"] }
 
 [dev-dependencies]
 # Tests bind ephemeral Unix-domain sockets under tempdirs.

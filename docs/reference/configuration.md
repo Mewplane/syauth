@@ -23,6 +23,12 @@ does not establish that the desktop is advertising or the phone is subscribed.
 
 The intended default desktop store belongs to the desktop account running the daemon. Keep directories private (`0700`) and key files private (`0600`). The shared default path is not a separate store for each Linux account. Changing the daemon's storage flags alone does not change the PAM module's fixed bond directory.
 
+When PAM creates `last.log` before the daemon starts, it uses mode `0600` and
+the bond-store directory's owner and group. Existing records are preserved.
+For a log created by an older version with root ownership, have an administrator
+restore its ownership to the desktop account and its mode to `0600`; upgrading
+does not change ownership of existing files.
+
 Android's signing private key is represented by its Keystore alias. It is not a raw Ed25519 seed stored in that TOML file. See [storage boundaries](../explanation/security.md#implementation-and-design) for the difference between a Keystore signing key and the application's bond material.
 
 ## PAM socket resolution
