@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: syauth
 Upstream-Contact: syauth contributors <noreply@anthropic.com>
-Source: https://github.com/sy/syauth
+Source: https://github.com/Mewplane/syauth
 
 Files: *
 Copyright: 2026 syauth contributors

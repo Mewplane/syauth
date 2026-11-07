@@ -66,7 +66,7 @@ Use the actual service name. This restores its `.bak` snapshot, including the sn
 
 Include the CLI and APK versions, distribution, BlueZ version, phone model and Android version, the action that triggered the problem, and sanitized logs from both sides. Distinguish a radio-off/on test from physical range loss or Doze: success in one does not establish recovery in the others.
 
-The [repository Bluetooth guide](https://github.com/dmytrogajewski/syauth/blob/master/docs/bluetooth.md) includes the emulator harness and its qualifications. Arch Linux KDE users can also consult the optional [package update checker](https://github.com/dmytrogajewski/syauth/blob/master/docs/arch-update-check.md).
+The [repository Bluetooth guide](https://github.com/Mewplane/syauth/blob/master/docs/bluetooth.md) includes the emulator harness and its qualifications. Arch Linux KDE users can also consult the optional [package update checker](https://github.com/Mewplane/syauth/blob/master/docs/arch-update-check.md).
 
 <!-- Structure: Diátaxis troubleshooting how-to; original prose for syauth. -->
 

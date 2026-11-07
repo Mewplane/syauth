@@ -37,7 +37,7 @@ case "$distro" in
     fedora) manager=dnf; format=rpm;;
     opensuse-tumbleweed|opensuse-leap|opensuse) manager=zypper; format=rpm;;
     arch|endeavouros|manjaro) manager=pacman; format=arch;;
-    *) fail "Unsupported distribution: $distro. See https://dmytrogajewski.github.io/syauth/how-to/install/";;
+    *) fail "Unsupported distribution: $distro. See https://mewplane.github.io/syauth/how-to/install/";;
 esac
 command -v "$manager" >/dev/null 2>&1 || fail "Native package manager missing: $manager"
 work=$(mktemp -d "${TMPDIR:-/tmp}/syauth-install.XXXXXXXX")
@@ -45,8 +45,8 @@ trap 'rm -rf "$work"' EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 fetch() { curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' --connect-timeout 15 --max-time 180 --retry 3 --output "$2" "$1"; }
-repo=https://github.com/dmytrogajewski/syauth
-api=https://api.github.com/repos/dmytrogajewski/syauth/releases
+repo=https://github.com/Mewplane/syauth
+api=https://api.github.com/repos/Mewplane/syauth/releases
 if [ -n "$version" ]; then
     endpoint=$api/tags/v$version
 else
@@ -86,4 +86,4 @@ case "$manager" in
     zypper) run_root zypper --non-interactive install --allow-unsigned-rpm "$work/$asset";;
     pacman) run_root pacman -U --noconfirm "$work/$asset";;
 esac
-printf '%s\n' 'Installed. PAM configuration is unchanged. Follow https://dmytrogajewski.github.io/syauth/tutorials/first-unlock/ to pair your phone and enable the user service.'
+printf '%s\n' 'Installed. PAM configuration is unchanged. Follow https://mewplane.github.io/syauth/tutorials/first-unlock/ to pair your phone and enable the user service.'

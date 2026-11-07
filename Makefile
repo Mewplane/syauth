@@ -93,7 +93,7 @@ lint: scope-discipline
 scope-discipline:
 	@echo "Running scope-discipline grep..."
 	@if git grep -nE \
-	    '(v0\.[0-9]+ ?(demo|will|follow.?up|reinstates|candidate))|(for the v0\.)|(production (version|will))|(demo only)|(temporary until)|(placeholder until)' \
+	    '(v0\.[0-9]+ ?(demo|will|follow.?up|reinstates|candidate))|(for[ ]the[ ]v0\.)|(production[ ](version|will))|(demo[ ]only)|(temporary[ ]until)|(placeholder[ ]until)' \
 	    -- 'crates/' 'syauth-android/app/src/main/' 'deploy/' \
 	    ':!:*tests/*' ':!:*test/*' ':!:*build/*' ':!:*target/*'; then \
 	  echo ""; \
@@ -279,8 +279,8 @@ endif
 # deploy/version.env; the values are duplicated here only to keep the
 # Make invocation self-contained.
 
-PACKAGE_VERSION ?= 0.1.0
-RPM_RELEASE     ?= 3
+PACKAGE_VERSION ?= 0.2.0
+RPM_RELEASE     ?= 5
 DEB_REVISION    ?= 1
 DIST_PREFIX     ?= syauth-$(PACKAGE_VERSION)
 DIST_TARBALL    ?= target/$(DIST_PREFIX).tar.gz

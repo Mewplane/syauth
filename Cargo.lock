@@ -2175,7 +2175,7 @@ checksum = "13c2bddecc57b384dee18652358fb23172facb8a2c51ccc10d74c157bdea3292"
 
 [[package]]
 name = "syauth"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "bluer",
  "syauth-core",
@@ -2188,7 +2188,7 @@ dependencies = [
 
 [[package]]
 name = "syauth-cli"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "assert_cmd",
@@ -2218,7 +2218,7 @@ dependencies = [
 
 [[package]]
 name = "syauth-core"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "blake3",
  "ed25519-dalek",
@@ -2240,7 +2240,7 @@ dependencies = [
 
 [[package]]
 name = "syauth-mobile"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "hex",
  "hkdf 0.13.0",
@@ -2253,7 +2253,7 @@ dependencies = [
 
 [[package]]
 name = "syauth-pam"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "ed25519-dalek",
  "getrandom 0.3.4",
@@ -2270,7 +2270,7 @@ dependencies = [
 
 [[package]]
 name = "syauth-presenced"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "ciborium",
@@ -2296,7 +2296,7 @@ dependencies = [
 
 [[package]]
 name = "syauth-transport"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-trait",
  "bluer",

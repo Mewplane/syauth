@@ -1,5 +1,5 @@
 site_name: syauth
-site_url: https://dmytrogajewski.github.io/syauth/
+site_url: https://mewplane.github.io/syauth/
 site_description: Understand and operate phone-approved Linux authentication.
 docs_dir: docs
 site_dir: target/docs-site
@@ -46,7 +46,7 @@ extra:
   generator: false
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/dmytrogajewski/syauth
+      link: https://github.com/Mewplane/syauth
       name: syauth on GitHub
 nav:
   - Start here: index.md

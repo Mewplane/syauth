@@ -57,6 +57,6 @@ syauth doctor --json
 systemctl --user status syauth-presenced --no-pager
 ```
 
-Source: [CLI dispatch](https://github.com/dmytrogajewski/syauth/blob/648375e/crates/syauth-cli/src/main.rs), [PAM installer](https://github.com/dmytrogajewski/syauth/blob/648375e/crates/syauth-cli/src/install_pam.rs), [daemon options](https://github.com/dmytrogajewski/syauth/blob/648375e/crates/syauth-presenced/src/main.rs).
+Source: [CLI dispatch](https://github.com/Mewplane/syauth/blob/648375e/crates/syauth-cli/src/main.rs), [PAM installer](https://github.com/Mewplane/syauth/blob/648375e/crates/syauth-cli/src/install_pam.rs), [daemon options](https://github.com/Mewplane/syauth/blob/648375e/crates/syauth-presenced/src/main.rs).
 
 <!-- Structure: Diátaxis reference; original prose for syauth. -->

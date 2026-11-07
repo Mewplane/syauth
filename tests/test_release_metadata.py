@@ -31,6 +31,7 @@ class ReleaseMetadataTests(unittest.TestCase):
             module.prepare(directory, "0.1.0", "a" * 40)
             manifest = json.loads((directory / "release.json").read_text())
             self.assertEqual(manifest["source_revision"], "a" * 40)
+            self.assertEqual(manifest["repository"], "Mewplane/syauth")
             lines = (directory / "SHA256SUMS").read_text().splitlines()
             self.assertEqual(len(lines), len(module.required_artifacts("0.1.0")) + 1)
             for line in lines:
