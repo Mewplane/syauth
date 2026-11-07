@@ -17,7 +17,7 @@ set -euo pipefail
 # Pinned constants. Single-source-of-truth lives in deploy/version.env;
 # we re-declare here so the script is self-contained when invoked
 # without the make wrapper.
-readonly PACKAGE_VERSION="0.2.0"
+readonly PACKAGE_VERSION="0.3.0"
 readonly RPM_RELEASE="1"
 readonly DEB_REVISION="1"
 readonly EXPECTED_VERSION_PREFIX="syauth ${PACKAGE_VERSION}"

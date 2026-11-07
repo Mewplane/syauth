@@ -1,3 +1,12 @@
+syauth (0.3.0-1) unstable; urgency=medium
+
+  * Add Nix packaging and declarative NixOS integration.
+  * Derive and validate the selected desktop account's PAM socket.
+  * Preserve daemon ownership of newly created PAM audit logs.
+  * Exercise installed PAM and configuration rollback in a NixOS VM in CI.
+
+ -- syauth contributors <maintainers@example.invalid>  Sun, 08 Nov 2026 00:00:00 +0000
+
 syauth (0.2.0-1) unstable; urgency=medium
 
   * Recover Bluetooth transport after controller loss.

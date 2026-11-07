@@ -27,29 +27,29 @@ To inspect the script, select a version, or preview package selection:
 ```sh
 curl -fsSLo install-syauth.sh https://mewplane.github.io/syauth/install.sh
 less install-syauth.sh
-sh install-syauth.sh --version 0.2.0 --dry-run
-sh install-syauth.sh --version 0.2.0
+sh install-syauth.sh --version 0.3.0 --dry-run
+sh install-syauth.sh --version 0.3.0
 ```
 
 ### Direct downloads
 
-The [v0.2.0 release](https://github.com/Mewplane/syauth/releases/tag/v0.2.0) has the native packages, manual archives, source, signed APK, and checksums. For example, on Debian/Ubuntu x86_64:
+The [v0.3.0 release](https://github.com/Mewplane/syauth/releases/tag/v0.3.0) has the native packages, manual archives, source, signed APK, and checksums. For example, on Debian/Ubuntu x86_64:
 
 ```sh
-release=https://github.com/Mewplane/syauth/releases/download/v0.2.0
-curl -fSLO "$release/syauth_0.2.0_amd64.deb"
+release=https://github.com/Mewplane/syauth/releases/download/v0.3.0
+curl -fSLO "$release/syauth_0.3.0_amd64.deb"
 curl -fSLO "$release/SHA256SUMS"
 sha256sum --check --ignore-missing SHA256SUMS
-sudo apt install ./syauth_0.2.0_amd64.deb
+sudo apt install ./syauth_0.3.0_amd64.deb
 ```
 
 Choose the corresponding artifact for other native managers, verify it against the same checksum file, then install it:
 
 | System | x86_64 artifact | Install command |
 | --- | --- | --- |
-| Fedora | `syauth-0.2.0-4.x86_64.rpm` | `sudo dnf install ./syauth-0.2.0-4.x86_64.rpm` |
-| openSUSE | `syauth-0.2.0-4.x86_64.rpm` | `sudo zypper install --allow-unsigned-rpm ./syauth-0.2.0-4.x86_64.rpm` |
-| Arch | `syauth-0.2.0-1-x86_64.pkg.tar.zst` | `sudo pacman -U ./syauth-0.2.0-1-x86_64.pkg.tar.zst` |
+| Fedora | `syauth-0.3.0-4.x86_64.rpm` | `sudo dnf install ./syauth-0.3.0-4.x86_64.rpm` |
+| openSUSE | `syauth-0.3.0-4.x86_64.rpm` | `sudo zypper install --allow-unsigned-rpm ./syauth-0.3.0-4.x86_64.rpm` |
+| Arch | `syauth-0.3.0-1-x86_64.pkg.tar.zst` | `sudo pacman -U ./syauth-0.3.0-1-x86_64.pkg.tar.zst` |
 
 For ARM64, use the DEB ending in `_arm64.deb`, or the RPM/Arch filename with `aarch64` replacing `x86_64`. The RPM is checksum-verified rather than RPM-signed; the openSUSE command permits that local unsigned RPM without disabling repository checks. These are downloadable native packages, not registered APT/DNF repositories or an AUR listing. Repeat the shell installer to fetch and install a newer release.
 
@@ -210,14 +210,14 @@ The `--dry-run` command **writes the unit file** but skips the binary copy and `
 
 ## Install the Android app
 
-Download the [signed Android APK](https://github.com/Mewplane/syauth/releases/download/v0.2.0/syauth-0.2.0-android.apk) and [SHA256SUMS](https://github.com/Mewplane/syauth/releases/download/v0.2.0/SHA256SUMS). Verify the downloaded file before opening it on your phone, or install it with ADB:
+Download the [signed Android APK](https://github.com/Mewplane/syauth/releases/download/v0.3.0/syauth-0.3.0-android.apk) and [SHA256SUMS](https://github.com/Mewplane/syauth/releases/download/v0.3.0/SHA256SUMS). Verify the downloaded file before opening it on your phone, or install it with ADB:
 
 ```sh
 sha256sum --check --ignore-missing SHA256SUMS
-adb install -r syauth-0.2.0-android.apk
+adb install -r syauth-0.3.0-android.apk
 ```
 
-With Android SDK Build Tools installed, verify the signature using `apksigner verify --verbose --print-certs syauth-0.2.0-android.apk`. Compare its SHA-256 certificate digest with the [published release signing identity](../contributing/releases.md#android-builds-and-signing). The private signing key is retained across releases. A debug APK uses a different identity and must be uninstalled before installing this release; uninstalling removes its local app data and requires pairing again.
+With Android SDK Build Tools installed, verify the signature using `apksigner verify --verbose --print-certs syauth-0.3.0-android.apk`. Compare its SHA-256 certificate digest with the [published release signing identity](../contributing/releases.md#android-builds-and-signing). The private signing key is retained across releases. A debug APK uses a different identity and must be uninstalled before installing this release; uninstalling removes its local app data and requires pairing again.
 
 To build from source, provide Android SDK platform 34, JDK 21, NDK 28.0.13004108, cargo-ndk 4.1.2, and the four Rust Android targets required by `scripts/build_aar.sh`. Its checked-in helper generates the matching UniFFI 0.29.5 bindings.
 

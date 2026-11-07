@@ -27,7 +27,7 @@ sh install-syauth.sh --dry-run
 sh install-syauth.sh
 ```
 
-Release downloads include DEB, RPM, Arch Linux packages, and manual Linux archives for x86_64 and ARM64, plus a signed [Android APK](https://github.com/Mewplane/syauth/releases/download/v0.2.0/syauth-0.2.0-android.apk), source archive, signing certificate, build metadata, and `SHA256SUMS`. See [installation and verification](https://mewplane.github.io/syauth/how-to/install/) for direct package commands and version-pinned downloads.
+Release downloads include DEB, RPM, Arch Linux packages, and manual Linux archives for x86_64 and ARM64, plus a signed [Android APK](https://github.com/Mewplane/syauth/releases/download/v0.3.0/syauth-0.3.0-android.apk), source archive, signing certificate, build metadata, and `SHA256SUMS`. See [installation and verification](https://mewplane.github.io/syauth/how-to/install/) for direct package commands and version-pinned downloads.
 
 Use Debian 12+, Ubuntu 24.04+, a current Fedora/openSUSE/Arch installation, or a compatible derivative, with glibc 2.36+, PAM, systemd user services, BlueZ, and a BLE adapter capable of advertising. The phone needs Android 13+ with a supported Ed25519 Keystore implementation and an enrolled strong biometric. The APK can install on older Android versions, but that does not establish signing-key support.
 
